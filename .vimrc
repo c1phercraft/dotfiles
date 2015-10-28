@@ -10,6 +10,7 @@ else
 		set backupdir=~/.vim/backup " where to put backup files
 		set directory=~/.vim/temp   " directory to place swap files in
 endif
+set encoding=utf-8
 
 """"""""
 " Colors
@@ -93,6 +94,9 @@ noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 """""""""""
 " Shortcuts
 set pastetoggle=<f11>		" hit f11 to paste
+" tab switch
+nnoremap <Tab> <ESC>:tabn<CR>
+nnoremap <S-Tab> <ESC>:tabp<CR>
 
 """"""""""
 " Commands
