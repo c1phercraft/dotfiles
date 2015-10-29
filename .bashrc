@@ -1,30 +1,46 @@
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
-# Completion options
-[[ -f /etc/bash_completion ]] && . /etc/bash_completion
-
 # Aliases
-if [ -f "${HOME}/.bash_aliases" ]; then
-  source "${HOME}/.bash_aliases"
-fi
-
-alias df='df -h'
-alias du='du -h'
-alias grep='grep --color'                     # show differences in colour
-alias egrep='egrep --color=auto'              # show differences in colour
-alias fgrep='fgrep --color=auto'              # show differences in colour
-alias ls='ls -hF --color=tty'                 # classify files in colour
-alias ll='ls -l'                              # long list
-alias la='ls -A'                              # all but . and ..
+[[ -f "${HOME}/.bash_aliases" ]] && source "${HOME}/.bash_aliases"
 
 # Functions
-if [ -f "${HOME}/.bash_functions" ]; then
-  source "${HOME}/.bash_functions"
+[[ -f "${HOME}/.bash_functions" ]] && source "${HOME}/.bash_functions"
+
+# Location specific definitions
+[[ -f "${HOME}/bin/bashrc" ]] && source "${HOME}/bin/bashrc"
+
+# Enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    source /etc/bash_completion
 fi
 
-settitle () 
-{ 
-  echo -ne "\e]2;$@\a\e]1;$@\a"; 
-}
+# Load RVM (Ruby Version Manager)
+[[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+color_prompt=
+case "$TERM" in
+    xterm-color) color_prompt=yes;;
+esac
+
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+fi
+
+if [ "$color_prompt" = yes ]; then
+    PS1="\n\[\e[30;1m\](\!)-(\j)-(\[\e[0m\]\u@\h\[\e[30;1m\])-(\[\e[1;33m\]\w\[\e[0m\]\[\e[30;1m\])\[\e[0m\]\n\`if [ \$? = 0 ]; then echo \[\e[32m\]:o\)\[\e[0m\]; else echo \[\e[31m\]:o\(\[\e[0m\]; fi\`\[\e[30;1m\]\\$\[\e[0m\] "
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+
+#PROMPT_DIRTRIM=5
+unset color_prompt
+
+export PATH=$HOME/bin:$PATH
 
