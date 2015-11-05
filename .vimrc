@@ -30,7 +30,7 @@ set encoding=utf-8
 
 """"""""
 " Colors
-colorscheme koehler
+colorscheme evening
 "colorscheme badwolf        " awesome colorscheme
 set background=dark
 syntax enable              " enable syntax processing
@@ -58,7 +58,10 @@ set expandtab       " tabs are spaces
 set backspace=indent,eol,start
 set autoindent      " keep current indentation if no special indentation is known
 set smartindent     " try to be smart about indenting (C-style)
-set nostartofline
+
+""""""""
+" Typing
+set digraph         " Use Ctrl-H to type: e Ctrl-H : -> ë
 
 """""""""""
 " UI config
@@ -69,7 +72,7 @@ set wildmenu             " visual autocomplete for command menu
 set lazyredraw           " redraw only when we need to.
 set showmatch            " highlight matching [{()}]
 set ruler                " Always show current position
-set cmdheight=2          " Height of the command bar
+set cmdheight=1          " Height of the command bar
 " No annoying sound on errors
 set noerrorbells
 set novisualbell
@@ -83,24 +86,24 @@ inoremap <Down> <C-o>gj
 inoremap <Up> <C-o>gk
 " Format the status line
 "set statusline=\ %F%m%r%h\ %w\ \ CWD:\ %r%{getcwd()}%h\ \ \ Line:\ %l
-set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%6l,%6v]
-"              | | | | |  |   |      |  |     |    |
-"              | | | | |  |   |      |  |     |    + current column
-"              | | | | |  |   |      |  |     +-- current line
-"              | | | | |  |   |      |  +-- current % into file
-"              | | | | |  |   |      +-- current syntax in square brackets
-"              | | | | |  |   +-- current fileformat
-"              | | | | |  +-- number of lines
+set statusline=%F%m%r%h%w\ \ [%L][%{&ff}]%y[%p%%][%6l,%6v]
+"              | | | | |      |   |      |  |     |    |
+"              | | | | |      |   |      |  |     |    + current column
+"              | | | | |      |   |      |  |     +-- current line
+"              | | | | |      |   |      |  +-- current % into file
+"              | | | | |      |   |      +-- current syntax in square brackets
+"              | | | | |      |   +-- current fileformat
+"              | | | | |      +-- number of lines
 "              | | | | +-- preview flag in square brackets
 "              | | | +-- help flag in square brackets
 "              | | +-- readonly flag in square brackets
-"              | +-- rodified flag in square brackets
+"              | +-- modified flag in square brackets
 "              +-- full path to file in the buffer
 
 if has('gui_running')
   set guioptions-=T  " no toolbar
   set columns=132 lines=50
-  set guifont=Consolas:h10
+  set guifont=Inconsolata\ 10
 endif
 
 """"""""
