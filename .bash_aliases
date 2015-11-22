@@ -1,22 +1,25 @@
 #
 # Bash aliases.
 #
-
 alias vi='vim'
-alias df='df -hkT'														# Human readable and system type
-alias du='du -hk'															# Human readable
-alias ls='ls -hF --color=tty'                 # classify files in colour
+alias df='df -hkT'							# Human readable and system type
+alias du='du -hk'							# Human readable
+alias ls='ls -hF --color=tty'               # classify files in colour
 alias ll='ls -alF --group-directories-first'  # long list
-alias la='ll -A'                              # all but . and ..
+alias la='ll -A'                            # all but . and ..
 alias l='ls -CF'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
-alias path='echo -e ${PATH//:/\\n}'  					# Show the path as a list of paths.
+alias path='echo -e ${PATH//:/\\n}'  		# Show the path as a list of paths.
 
-alias version='lsb_release -a'                # Version information.
-alias kbfix='setxkbmap -layout us'            # Make sure typing quotes works as expected.
+alias version='lsb_release -a'              # Version information.
+alias kbfix='setxkbmap -layout us'          # Make sure typing quotes works as expected.
+
+alias prettyxml='xmllint --format --xmlout --nsclean'   # Prettify an XML file.
+alias undupe="awk \'!x[$0]++\'"             # Removes duplicate lines without sorting.
+alias exitdisown='disown -a && exit'        # Exits the shell, leaving background jobs running.
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
