@@ -2,14 +2,34 @@
 # Bash functions.
 #
 
+# Some functions to produce pretty and consistent console output.
+e_header() {
+    printf "\n${BOLD}${PURPLE}==========  %s  ==========${NC}\n" "$*"
+}
+e_arrow() {
+    printf "➜  $@\n"
+}
+e_success() {
+    printf "${GREEN}✔  %s${NC}\n" "$@"
+}
+e_error() {
+    printf "${RED}✖  %s${NC}\n" "$@"
+}
+e_warning() {
+    printf "${YELLOW}➜  %s${NC}\n" "$@"
+}
+e_note() {
+    printf "${BOLD}${LIGHTBLUE}Note:${NC}  ${LIGHTBLUE}%s${NC}\n" "$@"
+}
+
 # Sets title for current terminal window.
-settitle ()
+settitle()
 {
   echo -ne "\e]2;$@\a\e]1;$@\a";
 }
 
 # Shows network information for your system
-netinfo ()
+netinfo()
 {
     echo "--------------- Network Information ---------------"
     /sbin/ifconfig | awk /'inet addr/ {print $2}'
@@ -22,9 +42,20 @@ netinfo ()
 }
 
 # Find files that match the given pattern.
-function ff()
+ff()
 {
     find . -type f -iname '*'$*'*' -ls ;
+}
+
+# Simple command line calculator.
+calc()
+{
+    awk "BEGIN{ print $* }" ;calc(){ awk "BEGIN{ print $* }" ;}
+}
+
+# List which packages are installed on a remote host.
+rpkg() {
+    ssh $* "dpkg -l | grep ii" | awk '{print $2}'
 }
 
 # vim: ft=sh
