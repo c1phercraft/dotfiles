@@ -3,22 +3,22 @@
 #
 
 # Some functions to produce pretty and consistent console output.
-e_header() {
+log_header() {
     printf "\n${BOLD}${PURPLE}==========  %s  ==========${NC}\n" "$*"
 }
-e_arrow() {
+log_arrow() {
     printf "➜  $@\n"
 }
-e_success() {
+log_success() {
     printf "${GREEN}✔  %s${NC}\n" "$@"
 }
-e_error() {
+log_error() {
     printf "${RED}✖  %s${NC}\n" "$@"
 }
-e_warning() {
+log_warning() {
     printf "${YELLOW}➜  %s${NC}\n" "$@"
 }
-e_note() {
+log_note() {
     printf "${BOLD}${LIGHTBLUE}Note:${NC}  ${LIGHTBLUE}%s${NC}\n" "$@"
 }
 
