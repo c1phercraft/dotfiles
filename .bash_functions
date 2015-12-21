@@ -58,4 +58,12 @@ rpkg() {
     ssh $* "dpkg -l | grep ii" | awk '{print $2}'
 }
 
+keycode() {
+    xev | grep -A2 --line-buffered '^KeyRelease' | sed -n '/keycode /s/^.*keycode \([0-9]*\).* (.*, \(.*\)).*$/\1 \2/p'
+}
+
+keys() {
+    xfconf-query -c xfce4-keyboard-shortcuts -l -v | cut -d'/' -f4 | awk '{printf "%30s", $2; print "\t" $1}' | sort | uniq
+}
+
 # vim: ft=sh

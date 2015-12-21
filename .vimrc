@@ -48,7 +48,6 @@ filetype indent plugin on  " enable file type detection
 
 """""""""""""""""
 " Spaces and tabs
-syntax enable       " enable syntax processing
 set tabstop=4       " number of visual spaces per TAB
 set softtabstop=4   " number of spaces in tab when editing
 set shiftwidth=4
@@ -138,4 +137,6 @@ nnoremap <S-Tab> <ESC>:tabp<CR>
 " Commands
 " Remove any trailing whitespace that is in the file
 autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
+" Syntax highlight gradle as groovy files
+au BufNewFile,BufRead *.gradle setf groovy
 
