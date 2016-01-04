@@ -65,7 +65,7 @@ set digraph         " Use Ctrl-H to type: e Ctrl-H : -> ë
 """""""""""
 " UI config
 set number               " show line numbers
-set cursorline           " highlight current line
+"set cursorline           " highlight current line
 filetype indent on       " load filetype-specific indent files
 set wildmenu             " visual autocomplete for command menu
 set lazyredraw           " redraw only when we need to.
