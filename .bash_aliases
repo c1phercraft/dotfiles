@@ -21,6 +21,9 @@ alias prettyxml='xmllint --format --xmlout --nsclean'   # Prettify an XML file.
 alias undupe="awk \'!x[$0]++\'"             # Removes duplicate lines without sorting.
 alias exitdisown='disown -a && exit'        # Exits the shell, leaving background jobs running.
 
+alias psg='ps ux|grep'                      # Lists all user processes matching the given expression.
+alias psga='ps aux|grep'                    # Lists all processes matching the given expression.
+
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
