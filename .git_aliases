@@ -1,0 +1,34 @@
+#
+# Git aliases.
+#
+
+git config --global alias.co 'checkout'
+git config --global alias.com 'checkout master'
+git config --global alias.cob 'checkout -b'
+git config --global alias.c 'commit -m'
+git config --global alias.amend 'commit --amend'
+git config --global alias.s 'status -s'
+# Unstage files already staged.
+git config --global alias.unstage 'reset -q HEAD --'
+# Get rid of any changes you made.
+git config --global alias.discard 'checkout --'
+
+# Check staged changes before committing.
+git config --global alias.precommit 'diff --cached --diff-algorithm=minimal -w'
+# Better diff output.
+git config --global alias.d 'diff --color-words'
+
+# Find files in repo.
+git config --global alias.f '!git ls-files | grep -i'
+
+# List commits as a tree.
+git config --global alias.tree 'log --graph --abbrev-commit --decorate --date=relative --format=format:"%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --all'
+
+# List commits.
+git config --global alias.ls 'log --format=format:"%C(bold blue)%h%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
+# List commits, also showing files touched.
+git config --global alias.ll 'log --decorate --stat --format=format:"%C(bold blue)%h%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
+# List commit history of a single file.
+git config --global alias.h 'log --oneline --follow --format=format:"%C(bold blue)%h%C(reset) %C(bold green)(%ar) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
+
+# vim: ft=sh

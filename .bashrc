@@ -7,6 +7,7 @@
 
 # Aliases
 [[ -f "${HOME}/.bash_aliases" ]] && source "${HOME}/.bash_aliases"
+[[ -f "${HOME}/.git_aliases" ]] && source "${HOME}/.git_aliases"
 
 # Functions
 [[ -f "${HOME}/.bash_functions" ]] && source "${HOME}/.bash_functions"
