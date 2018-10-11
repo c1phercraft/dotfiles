@@ -8,7 +8,7 @@ git config --global alias.cob 'checkout -b'
 git config --global alias.c 'commit -m'
 git config --global alias.amend 'commit --amend'
 # Short status overview.
-git config --global alias.s '!git rev-parse --abbrev-ref HEAD && git status -s'
+git config --global alias.s '!git status --short --branch'
 # Unstage files already staged.
 git config --global alias.unstage 'reset -q HEAD --'
 # Get rid of any changes you made.
@@ -25,6 +25,8 @@ git config --global alias.d 'diff --color-words'
 git config --global alias.ff '!git ls-files | grep -sI --color=auto'
 # Find text in files in repo.
 git config --global alias.fs '!git ls-files -z | xargs -0 grep -snI --color=auto'
+# Find text in commit message history.
+git config --global alias.fc '!git log --pretty="format:%C(bold green)%h%C(reset) - %C(dim white)%an%C(reset) - %C(white)%s%C(reset)" --name-status --grep'
 
 # %d - Branch
 # %h - SHA1
