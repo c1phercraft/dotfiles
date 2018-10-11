@@ -77,7 +77,7 @@ unset color_prompt
 shopt -s checkwinsize
 
 # Customize grep colors.
-export GREP_COLORS='sl=49;38;5;254:cx=49;38;5;238:mt=49;38;5;142;1:fn=49;38;5;83:ln=49;38;5;247;3:bn=49;39:se=49;39';
+export GREP_COLORS='sl=49;38;5;254:cx=49;38;5;238:mt=49;38;5;31;1:fn=49;38;5;83:ln=49;38;5;247;3:bn=49;39:se=49;39';
 
 # LESS man page colors (makes Man pages more readable).
 export LESS_TERMCAP_mb=$'\E[01;31m'
