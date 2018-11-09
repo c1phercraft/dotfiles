@@ -15,11 +15,17 @@ git config --global alias.unstage 'reset -q HEAD --'
 git config --global alias.discard 'checkout --'
 # Sync your current branch with the master one.
 git config --global alias.sync '!git fetch origin && git rebase origin/master'
+# Prunes refs to deleted remote branches.
+git config --global alias.prune 'fetch -p'
 
 # Check staged changes before committing.
-git config --global alias.precommit 'diff --cached --diff-algorithm=minimal -w'
+git config --global alias.precommit 'diff --cached --color-words --diff-algorithm=minimal -w'
 # Better diff output.
 git config --global alias.d 'diff --color-words'
+# Show difference since/from branch point.
+git config --global alias.dm 'diff --color-words origin/master... --'
+# Show files touched since/from branch point.
+git config --global alias.touched 'diff --name-status origin/master... --'
 
 # Find files in repo.
 git config --global alias.ff '!git ls-files | grep -sI --color=auto'
