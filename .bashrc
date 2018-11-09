@@ -88,6 +88,9 @@ export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
+# To prevent issues with quotes, we're setting the layout to US, which is nearly always correct.
+setxkbmap -layout us
+
 if [ -d $HOME/bin ]; then
 	export PATH=$HOME/bin:$PATH
 fi
