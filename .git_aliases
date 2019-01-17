@@ -54,6 +54,6 @@ git config --global alias.h 'log --oneline --follow --format=format:"%C(bold gre
 git config --global alias.conflicts 'diff --name-only --diff-filter=U'
 
 # Run Vim for a file path, starting at root of repo.
-git config --global alias.vi '!vim $1'
+git config --global alias.vi '!vim'
 
 # vim: ft=sh
