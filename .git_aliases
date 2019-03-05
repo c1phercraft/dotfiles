@@ -20,11 +20,15 @@ git config --global alias.sync '!git fetch origin && git rebase'
 git config --global alias.prune 'fetch -p'
 
 # Check staged changes before committing.
-git config --global alias.precommit 'diff --cached --color-words --diff-algorithm=minimal -w'
+git config --global alias.precommit 'diff --cached --diff-algorithm=minimal -w'
 # Better diff output.
-git config --global alias.d 'diff --color-words'
+git config --global alias.d 'diff'
+# Open directory diff in difftool.
+git config --global alias.ddiff 'difftool --dir-diff'
 # Show difference since/from branch point.
-git config --global alias.dm 'diff --color-words origin/master... --'
+git config --global alias.dm 'diff origin/master...'
+# Show difference with previous version in repo, aka last change.
+git config --global alias.dp 'diff HEAD@{1}'
 # Show files touched since/from branch point.
 git config --global alias.touched 'diff --name-status origin/master... --'
 
