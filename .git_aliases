@@ -49,12 +49,14 @@ git config --global alias.fc '!git log --pretty="format:%C(bold green)%h%C(reset
 git config --global alias.tree 'log --graph --abbrev-commit --decorate --date=relative --format=format:"%C(bold green)%h%C(reset) - %C(bold blue)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --all'
 # List commits as a bush, so key commits only to see branch history.
 git config --global alias.bush 'log --graph --abbrev-commit --decorate --simplify-by-decoration --date=relative --format=format:"%C(bold green)%h%C(reset) - %C(bold blue)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --all'
-# List commits.
-git config --global alias.ls 'log --format=format:"%C(bold green)%h%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
+# List commits, in short notation.
+git config --global alias.ls 'log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --date=short'
 # List commits, also showing files touched.
-git config --global alias.ll 'log --decorate --stat --format=format:"%C(bold green)%h%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
+git config --global alias.ll 'log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --date=short --decorate --stat'
+# List commits, also showing commit body text.
+git config --global alias.la 'log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(dim white)%an%C(reset)%C(bold yellow)%d%C(reset) %B" --date=short'
 # List commit history of a single file.
-git config --global alias.h 'log --oneline --follow --format=format:"%C(bold green)%h%C(reset) %C(bold blue)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
+git config --global alias.h 'log --oneline --follow --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ar%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
 # List files with conflicts
 git config --global alias.conflicts 'diff --name-only --diff-filter=U'
 
