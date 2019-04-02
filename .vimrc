@@ -35,8 +35,8 @@ colorscheme evening
 set background=dark
 syntax enable              " enable syntax processing
 filetype indent plugin on  " enable file type detection
-hi Normal guifg=lightgray guibg=Black ctermfg=lightgray ctermbg=Black
-hi Visual guifg=Black guibg=lightgray ctermfg=Black ctermbg=lightgray
+hi Normal guifg=lightgray guibg=black ctermfg=lightgray ctermbg=black
+hi Visual guifg=black guibg=lightgray ctermfg=black ctermbg=lightgray
 "hi Comment guifg=DarkGreen ctermfg=DarkGreen
 "hi Constant guifg=LightRed ctermfg=LightRed
 "hi Special guifg=LightRed ctermfg=LightRed gui=bold cterm=bold
@@ -163,8 +163,9 @@ nnoremap <S-Tab> <ESC>:tabp<CR>
 
 """"""""""
 " Commands
-" Remove any trailing whitespace that is in the file
-autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
+" Remove any trailing whitespace that is in the file - Disabled because for
+" Markdown this is significant whitespace...
+"autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
 " Syntax highlight gradle as groovy files
 au BufNewFile,BufRead *.gradle setf groovy
 
