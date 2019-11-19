@@ -14,6 +14,9 @@ git config --global alias.unstage 'reset -q HEAD --'
 git config --global alias.discard 'checkout --'
 # Sync your current branch with the master one.
 git config --global alias.msync '!git fetch origin && git rebase origin/master'
+# Sync your fork with the upstream one.
+git config --global alias.fsync '!git fetch --all && git remote prune origin && git remote prune upstream && git checkout master && git rebase upstream/master && git push origin master'
+# Sync your current branch with any other branch.
 git config --global alias.sync '!git fetch origin && git rebase'
 # Prunes refs to deleted remote branches.
 git config --global alias.prune 'fetch -p'
