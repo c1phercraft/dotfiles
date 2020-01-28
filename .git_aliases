@@ -7,19 +7,19 @@ git config --global alias.cob 'checkout -b'
 git config --global alias.c 'commit -m'
 git config --global alias.amend 'commit --amend'
 # Short status overview.
-git config --global alias.s '!git status --short --branch'
+git config --global alias.s 'status --short --branch'
 # Unstage files already staged.
 git config --global alias.unstage 'reset -q HEAD --'
 # Get rid of any changes you made.
 git config --global alias.discard 'checkout --'
 # Sync your current branch with the master one.
-git config --global alias.msync '!git fetch origin && git rebase origin/master'
+git config --global alias.msync '!git fetch -p origin && git rebase origin/master'
 # Sync your fork with the upstream one.
-git config --global alias.fsync '!git fetch --all && git remote prune origin && git remote prune upstream && git checkout master && git rebase upstream/master && git push origin master'
+git config --global alias.fsync '!git fetch --all -p && git checkout master && git rebase upstream/master && git push origin master'
 # Sync your current branch with any other branch.
-git config --global alias.sync '!git fetch origin && git rebase'
+git config --global alias.bsync '!git fetch origin && git rebase'
 # Prunes refs to deleted remote branches.
-git config --global alias.prune 'fetch -p'
+#git config --global alias.prune "!git fetch -p && for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do echo 'Pruning $branch'; git branch -D $branch; done"
 
 # Check staged changes before committing.
 git config --global alias.precommit 'diff --cached --diff-algorithm=minimal -w'
@@ -39,7 +39,7 @@ git config --global alias.ff '!git ls-files | grep -sI --color=auto'
 # Find text in files in repo.
 git config --global alias.fs '!git ls-files -z | xargs -0 grep -snI --color=auto'
 # Find text in commit message history.
-git config --global alias.fc '!git log --pretty="format:%C(bold green)%h%C(reset) - %C(dim white)%an%C(reset) - %C(white)%s%C(reset)" --name-status --grep'
+git config --global alias.fc 'log --pretty="format:%C(bold green)%h%C(reset) - %C(dim white)%an%C(reset) - %C(white)%s%C(reset)" --name-status --grep'
 
 # %d - Branch
 # %h - SHA1
@@ -61,6 +61,8 @@ git config --global alias.la 'log --format=format:"%C(bold green)%h%C(reset) %C(
 git config --global alias.h 'log --oneline --follow --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ar%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
 # List files with conflicts
 git config --global alias.conflicts 'diff --name-only --diff-filter=U'
+# List number of commits per user.
+git config --global alias.stats 'shortlog -sn --no-merges'
 
 # Run Vim for a file path, starting at root of repo.
 git config --global alias.vi '!vim'
@@ -68,5 +70,11 @@ git config --global alias.vi '!vim'
 # Remember login information.
 git config --global credential.helper cache
 git config --global credential.helper 'cache --timeout=36000'
+
+# Setup merge tool
+git config --global merge.tool p4mergetool
+git config --global mergetool.p4mergetool.cmd "/usr/local/bin/p4merge \$PWD/\$BASE \$PWD/\$LOCAL \$PWD/\$REMOTE \$PWD/\$MERGED"
+git config --global mergetool.p4mergetool.trustExitCode false
+git config --global mergetool.keepBackup false
 
 # vim: ft=sh
