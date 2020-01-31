@@ -154,6 +154,10 @@ nnoremap <leader>sv :source $MYVIMRC<CR>
 " Remove the Windows ^M - when the encodings gets messed up
 noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
 
+""""""""
+" Coding
+autocmd FileType c,cpp setlocal equalprg=clang-format\ -style='{BasedOnStyle:\ google,\ ColumnLimit:\ 100}'
+
 """""""""""
 " Shortcuts
 set pastetoggle=<f11>        " hit f11 to paste
