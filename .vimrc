@@ -146,14 +146,6 @@ endfunction
 nnoremap <silent> <C-n> :call SwitchToNextBuffer(1)<CR>
 nnoremap <silent> <C-p> :call SwitchToNextBuffer(-1)<CR>
 
-""""""""""""""""""
-" Leader shortcuts
-" edit vimrc and reload vimrc bindings
-nnoremap <leader>ev :vsp $MYVIMRC<CR>
-nnoremap <leader>sv :source $MYVIMRC<CR>
-" Remove the Windows ^M - when the encodings gets messed up
-noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
-
 """"""""
 " Coding
 autocmd FileType c,cpp setlocal equalprg=clang-format\ -style='{BasedOnStyle:\ google,\ ColumnLimit:\ 100}'
@@ -165,11 +157,20 @@ set pastetoggle=<f11>        " hit f11 to paste
 nnoremap <Tab> <ESC>:tabn<CR>
 nnoremap <S-Tab> <ESC>:tabp<CR>
 
+""""""""""""""""""
+" Leader '\' shortcuts
+" edit vimrc and reload vimrc bindings
+nnoremap <leader>ev :vsp $MYVIMRC<CR>
+nnoremap <leader>sv :source $MYVIMRC<CR>
+" Remove the Windows ^M - when the encodings gets messed up
+noremap <Leader>m mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+
 """"""""""
 " Commands
 " Remove any trailing whitespace that is in the file - Disabled because for
 " Markdown this is significant whitespace...
 "autocmd BufRead,BufWrite * if ! &bin | silent! %s/\s\+$//ge | endif
+"
 " Syntax highlight gradle as groovy files
 au BufNewFile,BufRead *.gradle setf groovy
 
