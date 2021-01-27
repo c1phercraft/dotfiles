@@ -65,7 +65,7 @@ if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1="\n\[${DARKGRAY}\](\D{%d%H%M})-(\j)-(\[${LIGHTGRAY}\]\u@\h\[${DARKGRAY}\])-(\[${YELLOW}\]\w\[${DARKGRAY}\])\n\`if [ \$? = 0 ]; then echo \"\[${GREEN}\]:o)\"; else echo \"\[${RED}\]:o(\"; fi\`\[${DARKGRAY}\]\$\[${NC}\] "
+    PS1="\n\[${DARKGRAY}\](\D{%d~%H%M})-(\j)-(\[${LIGHTGRAY}\]\u@\h\[${DARKGRAY}\])-(\[${YELLOW}\]\w\[${DARKGRAY}\])\n\`if [ \$? = 0 ]; then echo \"\[${GREEN}\]:o)\"; else echo \"\[${RED}\]:o(\"; fi\`\[${DARKGRAY}\]\$\[${NC}\] "
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
