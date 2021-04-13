@@ -64,8 +64,18 @@ if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
     color_prompt=yes
 fi
 
+# Some Git specific stuff.
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWCOLORHINTS=1
+git_prompt="-(\[${LIGHTGREEN}\]\[${ITALIC}\]%s\[${DARKGRAY}\])"
+
+update_prompt() {
+    PS1="\n\[${DARKGRAY}\](\[${LIGHTGRAY}\]\D{%d~%H%M}\[${DARKGRAY}\])-(\[${LIGHTGRAY}\]\j\[${DARKGRAY}\])-(\[${LIGHTGRAY}\]\u@\h\[${DARKGRAY}\])-(\[${YELLOW}\]\w\[${DARKGRAY}\])$(__git_ps1 $git_prompt)\n`if [ $? = 0 ]; then echo "\[${GREEN}\]:o)"; else echo "\[${RED}\]:o("; fi`\[${DARKGRAY}\]\$\[${NC}\] "
+}
+
 if [ "$color_prompt" = yes ]; then
-    PS1="\n\[${DARKGRAY}\](\D{%d~%H%M})-(\j)-(\[${LIGHTGRAY}\]\u@\h\[${DARKGRAY}\])-(\[${YELLOW}\]\w\[${DARKGRAY}\])\n\`if [ \$? = 0 ]; then echo \"\[${GREEN}\]:o)\"; else echo \"\[${RED}\]:o(\"; fi\`\[${DARKGRAY}\]\$\[${NC}\] "
+    shopt -u promptvars
+    PROMPT_COMMAND=update_prompt
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
