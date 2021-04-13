@@ -76,6 +76,9 @@ git config --global alias.vi '!vim'
 git config --global credential.helper cache
 git config --global credential.helper 'cache --timeout=36000'
 
+# Fix line endings.
+git config --global core.autocrlf input
+
 # Setup merge tool
 git config --global merge.tool p4mergetool
 git config --global mergetool.p4mergetool.cmd "/usr/local/bin/p4merge \$PWD/\$BASE \$PWD/\$LOCAL \$PWD/\$REMOTE \$PWD/\$MERGED"

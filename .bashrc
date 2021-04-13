@@ -70,7 +70,7 @@ export GIT_PS1_SHOWCOLORHINTS=1
 git_prompt="-(\[${LIGHTGREEN}\]\[${ITALIC}\]%s\[${DARKGRAY}\])"
 
 update_prompt() {
-    PS1="\n\[${DARKGRAY}\](\[${LIGHTGRAY}\]\D{%d~%H%M}\[${DARKGRAY}\])-(\[${LIGHTGRAY}\]\j\[${DARKGRAY}\])-(\[${LIGHTGRAY}\]\u@\h\[${DARKGRAY}\])-(\[${YELLOW}\]\w\[${DARKGRAY}\])$(__git_ps1 $git_prompt)\n`if [ $? = 0 ]; then echo "\[${GREEN}\]:o)"; else echo "\[${RED}\]:o("; fi`\[${DARKGRAY}\]\$\[${NC}\] "
+    PS1="\n\[${DARKGRAY}\](\[${LIGHTGRAY}\]\D{%d~%H%M}\[${DARKGRAY}\])-(\[${LIGHTGRAY}\]\j\[${DARKGRAY}\])-(\[${LIGHTGRAY}\]\u\[${DARKGRAY}\]@\[${LIGHTGRAY}\]\h\[${DARKGRAY}\])-(\[${YELLOW}\]\w\[${DARKGRAY}\])$(__git_ps1 $git_prompt)\n`if [ $? = 0 ]; then echo "\[${GREEN}\]:o)"; else echo "\[${RED}\]:o("; fi`\[${DARKGRAY}\]\$\[${NC}\] "
 }
 
 if [ "$color_prompt" = yes ]; then
