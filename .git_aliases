@@ -71,7 +71,7 @@ git config --global alias.rh '!git rs --color=always|head -20'
 # List reflogs, also showing files touched.
 git config --global alias.rl 'reflog --format=format:"%C(bold green)%h%C(reset) %C(bold blue)%gD%C(reset) %C(white)%gs%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --stat'
 # Sort branches on most recent first.
-git config --global alias.br 'branch --sort=-authordate'
+git config --global alias.br '!git branch --sort=-authordate -vv |grep -v master|awk "ADDON=\"\"; /: gone/{ADDON=\" -MERGED-\"}; {print \$1 ADDON}"'
 
 # List commit history of a single file.
 git config --global alias.h 'log --oneline --follow --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ar%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
