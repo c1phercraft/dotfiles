@@ -28,7 +28,7 @@ fi
 # Load RVM (Ruby Version Manager)
 [[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
 
-# Define a few Colours
+# Define a few colours
 BLACK='\e[0;30m'
 BLUE='\e[0;34m'
 GREEN='\e[0;32m'
@@ -48,36 +48,90 @@ WHITE='\e[1;37m'
 BOLD='\e[1m'
 ITALIC='\e[3m'
 UNDERLINE='\e[4m'
-NC='\e[0m'              # No Color
+NC='\e[0m'              # No color.
 
-# set a fancy prompt (non-color, unless we know we "want" color)
+# Set a fancy prompt (non-color, unless we know we "want" color)
 color_prompt=
 case "$TERM" in
-    xterm-color) color_prompt=yes;;
-    xterm) color_prompt=yes;;
+  xterm-color) color_prompt=yes;;
+  xterm) color_prompt=yes;;
 esac
 
 if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-    color_prompt=yes
+  # We have color support; assume it's compliant with Ecma-48
+  # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+  # a case would tend to support setf rather than setaf.)
+  color_prompt=yes
 fi
 
-# Some Git specific stuff.
-export GIT_PS1_SHOWDIRTYSTATE=1
-export GIT_PS1_SHOWCOLORHINTS=1
-git_prompt="-(\[${LIGHTGREEN}\]\[${ITALIC}\]%s\[${DARKGRAY}\])"
-
 update_prompt() {
-    PS1="\n\[${DARKGRAY}\](\[${LIGHTGRAY}\]\D{%d~%H%M}\[${DARKGRAY}\])-(\[${LIGHTGRAY}\]\j\[${DARKGRAY}\])-(\[${LIGHTGRAY}\]\u\[${DARKGRAY}\]@\[${LIGHTGRAY}\]\h\[${DARKGRAY}\])-(\[${YELLOW}\]\w\[${DARKGRAY}\])$(__git_ps1 $git_prompt)\n`if [ $? = 0 ]; then echo "\[${GREEN}\]:o)"; else echo "\[${RED}\]:o("; fi`\[${DARKGRAY}\]\$\[${NC}\] "
+  local LAST_RESULT=$?
+  
+  # Day and time.
+  PS1="\n\[$DARKGRAY\](\[$LIGHTGRAY\]\D{%d~%H%M}\[$DARKGRAY\])"
+  # Number of jobs.
+  PS1+="-(\[$LIGHTGRAY\]\j\[$DARKGRAY\])"
+  # User and host.
+  PS1+="-(\[$LIGHTGRAY\]\u\[$DARKGRAY\]@\[$LIGHTGRAY\]\h\[$DARKGRAY\])"
+  # Current working directory.
+  PS1+="-(\[$YELLOW\]\w\[$DARKGRAY\])"
+  
+  if `git rev-parse --is-inside-work-tree > /dev/null 2>&1`; then
+    # Inside a Git repo, so add more information.
+    PS1+="-("
+
+    # Git branch.
+    BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+    PS1+="\[$LIGHTGREEN\]\[$ITALIC\]$BRANCH\[$NC\]"
+       
+    local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
+    if [ $NUM_AHEAD -gt 0 ]; then
+      # Commits that are not pushed to remote yet.
+      PS1+="\[$LIGHTRED\]⇡$NUM_AHEAD\[$DARKGRAY\]"
+    fi
+    local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
+    if [ $NUM_BEHIND -gt 0 ]; then
+      # Commits on remote that have not been pulled yet.
+      PS1+="\[$LIGHTCYAN\]⇣$NUM_BEHIND\[$DARKGRAY\]"
+    fi
+    
+    local FLAGS=
+    local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
+    if ! git diff --quiet 2> /dev/null; then
+      # Unstaged changes.
+      FLAGS+="\[$YELLOW\]●\[$DARKGRAY\]"
+    fi
+    if ! git diff --cached --quiet 2> /dev/null; then
+      # Staged changes.
+      FLAGS+="\[$LIGHTGREEN\]●\[$DARKGRAY\]"
+    fi
+    if [ -n $GIT_DIR ] && test -r $GIT_DIR/MERGE_HEAD; then
+      # In the middle of a merge.
+      FLAGS+="\[$LIGHTRED\] ⪫\[$DARKGRAY\]"
+    fi
+    
+    # Add flags.
+    if [ "$FLAGS" != "" ]; then
+      PS1+=" $FLAGS"
+    fi
+    PS1+="\[$DARKGRAY\])"
+  fi
+  
+  # Actual prompt.
+  PS1+="\n"
+  if [ $LAST_RESULT = 0 ]; then
+    PS1+="\[$GREEN\]:o)"
+  else
+    PS1+="\[$RED\]:o("
+  fi
+  PS1+="\[$DARKGRAY\]\$\[$NC\] "
 }
 
-if [ "$color_prompt" = yes ]; then
-    shopt -u promptvars
-    PROMPT_COMMAND=update_prompt
+if [ "$color_prompt" = "yes" ]; then
+  shopt -u promptvars
+  PROMPT_COMMAND=update_prompt
 else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+  PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 
 #PROMPT_DIRTRIM=5
@@ -102,7 +156,7 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 setxkbmap -layout us
 
 if [ -d $HOME/bin ]; then
-	export PATH=$HOME/bin:$PATH
+  export PATH=$HOME/bin:$PATH
 fi
 
 # vim: ft=sh
