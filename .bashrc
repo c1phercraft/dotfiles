@@ -98,16 +98,16 @@ update_prompt() {
     local FLAGS=
     local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
     if ! git diff --quiet 2> /dev/null; then
-      # Unstaged changes.
-      FLAGS+="\[$YELLOW\]●\[$DARKGRAY\]"
+      # Unstaged changes.●
+      FLAGS+="\[$YELLOW\]*\[$DARKGRAY\]"
     fi
     if ! git diff --cached --quiet 2> /dev/null; then
       # Staged changes.
-      FLAGS+="\[$LIGHTGREEN\]●\[$DARKGRAY\]"
+      FLAGS+="\[$LIGHTGREEN\]&\[$DARKGRAY\]"
     fi
     if [ -n $GIT_DIR ] && test -r $GIT_DIR/MERGE_HEAD; then
       # In the middle of a merge.
-      FLAGS+="\[$LIGHTRED\] ⪫\[$DARKGRAY\]"
+      FLAGS+="\[$LIGHTRED\]Y\[$DARKGRAY\]"
     fi
     
     # Add flags.
