@@ -81,7 +81,7 @@ update_prompt() {
     PS1+="-("
 
     # Git branch.
-    BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+    BRANCH="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
     PS1+="\[$LIGHTGREEN\]\[$ITALIC\]$BRANCH\[$NC\]"
        
     local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
