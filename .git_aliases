@@ -21,8 +21,8 @@ git config --global alias.bsync '!git fetch origin && git rebase'
 # Prunes refs to deleted remote branches.
 #git config --global alias.prune "!git fetch -p && for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do echo 'Pruning $branch'; git branch -D $branch; done"
 
-# Push current branch to remote.
-git config alias.pushup 'push -u origin HEAD'
+# Push to and create current branch on remote.
+git config --global alias.pushup 'push -u origin HEAD'
 
 # Check staged changes before committing.
 git config --global alias.precommit 'diff --cached --diff-algorithm=minimal -w'
