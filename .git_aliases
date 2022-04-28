@@ -1,6 +1,9 @@
 #
 # Git aliases.
 #
+
+# List all aliases.
+git config --global alias.alias "! git config --get-regexp ^alias\. | sed -e s/^alias\.// -e s/\ /\ =\ /"
 git config --global alias.co 'checkout'
 git config --global alias.com 'checkout master'
 git config --global alias.cob 'checkout -b'
@@ -63,6 +66,8 @@ git config --global alias.lh '!git ls --color=always|head -20'
 git config --global alias.ll 'log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --date=short --decorate --stat'
 # List commits, also showing commit body text.
 git config --global alias.la 'log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(dim white)%an%C(reset)%C(bold yellow)%d%C(reset) %B" --date=short'
+# List commits, that match the given text; case-insensitive.
+git config --global alias.search '!f() { git log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(dim white)%an%C(reset)%C(bold yellow)%d%C(reset) %B" --date=short --grep "$@"i -i; }; f'
 
 # List reflog, in short notation.
 git config --global alias.rs 'reflog --format=format:"%C(bold green)%h%C(reset) %C(bold blue)%gD%C(reset) %C(white)%gs%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
@@ -70,6 +75,7 @@ git config --global alias.rs 'reflog --format=format:"%C(bold green)%h%C(reset) 
 git config --global alias.rh '!git rs --color=always|head -20'
 # List reflogs, also showing files touched.
 git config --global alias.rl 'reflog --format=format:"%C(bold green)%h%C(reset) %C(bold blue)%gD%C(reset) %C(white)%gs%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --stat'
+
 # Sort branches on most recent first.
 git config --global alias.br '!git branch --sort=-authordate -vv |grep -v master|awk "ADDON=\"\"; /: gone/{ADDON=\" -MERGED-\"}; {print \$1 ADDON}"'
 
