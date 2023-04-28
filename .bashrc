@@ -25,9 +25,6 @@ fi
 # Local completion scripts
 [[ -f "${HOME}/.bash_completion" ]] && source "${HOME}/.bash_completion"
 
-# Load RVM (Ruby Version Manager)
-[[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
-
 # Define a few colours
 BLACK='\e[0;30m'
 BLUE='\e[0;34m'
@@ -159,4 +156,19 @@ if [ -d $HOME/bin ]; then
   export PATH=$HOME/bin:$PATH
 fi
 
-# vim: ft=sh
+if [ -d $HOME/.rvm ]; then
+  # Load RVM (Ruby Version Manager)
+  [[ -s $HOME/.rvm/scripts/rvm ]] && source $HOME/.rvm/scripts/rvm
+
+  # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+  export PATH="$PATH:$HOME/.rvm/bin"
+
+  # RVM completion.
+  [[ -r $HOME/.rvm/scripts/completion ]] && . $HOME/.rvm/scripts/completion
+else
+  # Ruby's bundle doesn't know where to install gems otherwise.
+  export GEM_HOME=$(ruby -e 'puts Gem.user_dir')
+fi
+
+# ---------- non-manual additions below -------------------------------
+
