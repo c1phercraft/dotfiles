@@ -25,22 +25,22 @@ fi
 # Local completion scripts
 [[ -f "${HOME}/.bash_completion" ]] && source "${HOME}/.bash_completion"
 
-# Define a few colours
+# Define a few foreground colours
 BLACK='\e[0;30m'
-BLUE='\e[0;34m'
-GREEN='\e[0;32m'
-CYAN='\e[0;36m'
 RED='\e[0;31m'
-PURPLE='\e[0;35m'
+GREEN='\e[0;32m'
 BROWN='\e[0;33m'
+BLUE='\e[0;34m'
+PURPLE='\e[0;35m'
+CYAN='\e[0;36m'
 LIGHTGRAY='\e[0;37m'
 DARKGRAY='\e[1;30m'
-LIGHTBLUE='\e[1;34m'
-LIGHTGREEN='\e[1;32m'
-LIGHTCYAN='\e[1;36m'
 LIGHTRED='\e[1;31m'
-LIGHTPURPLE='\e[1;35m'
+LIGHTGREEN='\e[1;32m'
 YELLOW='\e[1;33m'
+LIGHTBLUE='\e[1;34m'
+LIGHTPURPLE='\e[1;35m'
+LIGHTCYAN='\e[1;36m'
 WHITE='\e[1;37m'
 BOLD='\e[1m'
 ITALIC='\e[3m'
@@ -63,15 +63,16 @@ fi
 
 update_prompt() {
   local LAST_RESULT=$?
+  local DELIM=$LIGHTGRAY
   
   # Day and time.
-  PS1="\n\[$DARKGRAY\](\[$LIGHTGRAY\]\D{%d~%H%M}\[$DARKGRAY\])"
+  PS1="\n\[$DELIM\](\[$WHITE\]\D{%d~%H%M}\[$DELIM\])"
   # Number of jobs.
-  PS1+="-(\[$LIGHTGRAY\]\j\[$DARKGRAY\])"
+  PS1+="-(\[$WHITE\]\j\[$DELIM\])"
   # User and host.
-  PS1+="-(\[$LIGHTGRAY\]\u\[$DARKGRAY\]@\[$LIGHTGRAY\]\h\[$DARKGRAY\])"
+  PS1+="-(\[$WHITE\]\u\[$DELIM\]@\[$WHITE\]\h\[$DELIM\])"
   # Current working directory.
-  PS1+="-(\[$YELLOW\]\w\[$DARKGRAY\])"
+  PS1+="-(\[$YELLOW\]\w\[$DELIM\])"
   
   if `git rev-parse --is-inside-work-tree > /dev/null 2>&1`; then
     # Inside a Git repo, so add more information.
@@ -84,34 +85,34 @@ update_prompt() {
     local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
     if [ $NUM_AHEAD -gt 0 ]; then
       # Commits that are not pushed to remote yet.
-      PS1+="\[$LIGHTRED\]⇡$NUM_AHEAD\[$DARKGRAY\]"
+      PS1+="\[$LIGHTRED\]⇡$NUM_AHEAD\[$DELIM\]"
     fi
     local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
     if [ $NUM_BEHIND -gt 0 ]; then
       # Commits on remote that have not been pulled yet.
-      PS1+="\[$LIGHTCYAN\]⇣$NUM_BEHIND\[$DARKGRAY\]"
+      PS1+="\[$LIGHTCYAN\]⇣$NUM_BEHIND\[$DELIM\]"
     fi
     
     local FLAGS=
     local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
     if ! git diff --quiet 2> /dev/null; then
       # Unstaged changes.●
-      FLAGS+="\[$YELLOW\]*\[$DARKGRAY\]"
+      FLAGS+="\[$YELLOW\]*\[$DELIM\]"
     fi
     if ! git diff --cached --quiet 2> /dev/null; then
       # Staged changes.
-      FLAGS+="\[$LIGHTGREEN\]&\[$DARKGRAY\]"
+      FLAGS+="\[$LIGHTGREEN\]&\[$DELIM\]"
     fi
     if [ -n $GIT_DIR ] && test -r $GIT_DIR/MERGE_HEAD; then
       # In the middle of a merge.
-      FLAGS+="\[$LIGHTRED\]Y\[$DARKGRAY\]"
+      FLAGS+="\[$LIGHTRED\]Y\[$DELIM\]"
     fi
     
     # Add flags.
     if [ "$FLAGS" != "" ]; then
       PS1+=" $FLAGS"
     fi
-    PS1+="\[$DARKGRAY\])"
+    PS1+="\[$DELIM\])"
   fi
   
   # Actual prompt.
@@ -121,7 +122,7 @@ update_prompt() {
   else
     PS1+="\[$RED\]:o("
   fi
-  PS1+="\[$DARKGRAY\]\$\[$NC\] "
+  PS1+="\[$DELIM\]\$\[$NC\] "
 }
 
 if [ "$color_prompt" = "yes" ]; then
