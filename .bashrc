@@ -61,6 +61,15 @@ if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
   color_prompt=yes
 fi
 
+set_title() {
+  local title=$1
+  if [ "$GUAKE_TAB_UUID" == "" ]; then
+    PS1+="\e]2;$title\a"
+  else
+    guake -r "$title"
+  fi
+}
+
 update_prompt() {
   local LAST_RESULT=$?
   local DELIM=$LIGHTGRAY
@@ -113,6 +122,13 @@ update_prompt() {
       PS1+=" $FLAGS"
     fi
     PS1+="\[$DELIM\])"
+
+    # Terminal title shows current repo.
+    ROOT_PATH="$(git rev-parse --show-toplevel 2> /dev/null)"
+    ROOT_PATH=$(basename $ROOT_PATH)
+    set_title $ROOT_PATH
+  else
+    set_title "Terminal"
   fi
   
   # Actual prompt.
@@ -165,10 +181,19 @@ if [ -d $HOME/.rvm ]; then
   export PATH="$PATH:$HOME/.rvm/bin"
 
   # RVM completion.
-  [[ -r $HOME/.rvm/scripts/completion ]] && . $HOME/.rvm/scripts/completion
+  [[ -r $HOME/.rvm/scripts/completion ]] && source $HOME/.rvm/scripts/completion
 else
   # Ruby's bundle doesn't know where to install gems otherwise.
   export GEM_HOME=$(ruby -e 'puts Gem.user_dir')
+fi
+
+if [ -d $HOME/.nvm ]; then
+  # Load NVM (Node Version Manager)
+  export NVM_DIR="$HOME/.nvm"
+  [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+  
+  # NVM completion.
+  [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
 fi
 
 # ---------- non-manual additions below -------------------------------
