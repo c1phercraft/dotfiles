@@ -2,8 +2,10 @@
 # Git aliases.
 #
 
+# Aliases starting with '!command ...' are run in the root of the repo.
+
 # List all aliases.
-git config --global alias.alias "! git config --get-regexp ^alias\. | sed -e s/^alias\.// -e s/\ /\ =\ /"
+git config --global alias.alias "!git config --get-regexp ^alias\. | sed -e s/^alias\.// -e s/\ /\ =\ /"
 git config --global alias.co 'checkout'
 git config --global alias.com 'checkout master'
 git config --global alias.cob 'checkout -b'
@@ -32,7 +34,7 @@ git config --global alias.precommit 'diff --cached --diff-algorithm=minimal -w'
 # Better diff output.
 git config --global alias.d 'diff'
 # Open directory diff in difftool.
-git config --global alias.ddiff 'difftool --dir-diff'
+#broken? git config --global alias.ddiff 'difftool --dir-diff'
 # Show difference since/from branch point.
 git config --global alias.dm 'diff origin/master...'
 # Show difference with previous version in repo, aka last change.
@@ -43,7 +45,7 @@ git config --global alias.touched 'diff --name-status origin/master... --'
 # Find files in repo.
 git config --global alias.ff '!git ls-files | grep -sI --color=auto'
 # Find text in files in repo.
-git config --global alias.fs '!git ls-files -z | xargs -0 grep -snI --color=auto'
+git config --global alias.fs '!git grep -nE --heading --break'
 # Find text in commit message history.
 git config --global alias.fc 'log --pretty="format:%C(bold green)%h%C(reset) - %C(dim white)%an%C(reset) - %C(white)%s%C(reset)" --name-status --grep'
 
@@ -96,10 +98,16 @@ git config --global credential.helper 'cache --timeout=36000'
 # Fix line endings.
 git config --global core.autocrlf input
 
-# Setup merge tool
+# Setup merge tool.
 git config --global merge.tool p4mergetool
 git config --global mergetool.p4mergetool.cmd "/usr/local/bin/p4merge \$PWD/\$BASE \$PWD/\$LOCAL \$PWD/\$REMOTE \$PWD/\$MERGED"
 git config --global mergetool.p4mergetool.trustExitCode false
 git config --global mergetool.keepBackup false
+
+# Grep colors.
+git config --global color.grep.filename brightgreen
+git config --global color.grep.linenumber brightblack
+git config --global color.grep.match blue bold
+git config --global color.grep.separator brightblack
 
 # vim: ft=sh
