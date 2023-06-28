@@ -26,26 +26,26 @@ fi
 [[ -f "${HOME}/.bash_completion" ]] && source "${HOME}/.bash_completion"
 
 # Define a few foreground colours
-BLACK='\e[0;30m'
-RED='\e[0;31m'
-GREEN='\e[0;32m'
-BROWN='\e[0;33m'
-BLUE='\e[0;34m'
-PURPLE='\e[0;35m'
-CYAN='\e[0;36m'
-LIGHTGRAY='\e[0;37m'
-DARKGRAY='\e[1;30m'
-LIGHTRED='\e[1;31m'
-LIGHTGREEN='\e[1;32m'
-YELLOW='\e[1;33m'
-LIGHTBLUE='\e[1;34m'
-LIGHTPURPLE='\e[1;35m'
-LIGHTCYAN='\e[1;36m'
-WHITE='\e[1;37m'
-BOLD='\e[1m'
-ITALIC='\e[3m'
-UNDERLINE='\e[4m'
-NC='\e[0m'              # No color.
+NC="\[\033[0m\]"              # No color.
+BLACK="\[\033[0;30m\]"
+RED="\[\033[0;31m\]"
+GREEN="\[\033[0;32m\]"
+BROWN="\[\033[0;33m\]"
+BLUE="\[\033[0;34m\]"
+PURPLE="\[\033[0;35m\]"
+CYAN="\[\033[0;36m\]"
+DARKGRAY="\[\033[0;37m\]"
+LIGHTGRAY="\[\033[1;30m\]"
+LIGHTRED="\[\033[1;31m\]"
+LIGHTGREEN="\[\033[1;32m\]"
+YELLOW="\[\033[1;33m\]"
+LIGHTBLUE="\[\033[1;34m\]"
+LIGHTPURPLE="\[\033[1;35m\]"
+LIGHTCYAN="\[\033[1;36m\]"
+WHITE="\[\033[1;37m\]"
+BOLD="\[\033[1m\]"
+ITALIC="\[\033[3m\]"
+UNDERLINE="\[\033[4m\]"
 
 # Set a fancy prompt (non-color, unless we know we "want" color)
 color_prompt=
@@ -75,53 +75,59 @@ update_prompt() {
   local DELIM=$LIGHTGRAY
   
   # Day and time.
-  PS1="\n\[$DELIM\](\[$WHITE\]\D{%d~%H%M}\[$DELIM\])"
+  PS1="\n$DELIM($WHITE\D{%d~%H%M}$DELIM)"
   # Number of jobs.
-  PS1+="-(\[$WHITE\]\j\[$DELIM\])"
+  PS1+="-($WHITE\j$DELIM)"
   # User and host.
-  PS1+="-(\[$WHITE\]\u\[$DELIM\]@\[$WHITE\]\h\[$DELIM\])"
+  PS1+="-($WHITE\u$DELIM@$WHITE\h$DELIM)"
   # Current working directory.
-  PS1+="-(\[$YELLOW\]\w\[$DELIM\])"
+  PS1+="-($YELLOW\w$DELIM)"
   
-  if `git rev-parse --is-inside-work-tree > /dev/null 2>&1`; then
+  if `git rev-parse --is-inside-work-tree 2> /dev/null`; then
     # Inside a Git repo, so add more information.
     PS1+="-("
 
     # Git branch.
     BRANCH="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
-    PS1+="\[$LIGHTGREEN\]\[$ITALIC\]$BRANCH\[$NC\]"
+    PS1+="$LIGHTGREEN$ITALIC$BRANCH$NC"
        
+    local ICON_AHEAD='⇡'
+    local ICON_BEHIND='⇣'
+    local ICON_UNSTAGED='↥' #●
+    local ICON_STAGED='⤒'
+    local ICON_MERGING='ᛣ'
+
     local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
     if [ $NUM_AHEAD -gt 0 ]; then
       # Commits that are not pushed to remote yet.
-      PS1+="\[$LIGHTRED\]⇡$NUM_AHEAD\[$DELIM\]"
+      PS1+="$LIGHTRED$ICON_AHEAD$NUM_AHEAD$DELIM"
     fi
     local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
     if [ $NUM_BEHIND -gt 0 ]; then
       # Commits on remote that have not been pulled yet.
-      PS1+="\[$LIGHTCYAN\]⇣$NUM_BEHIND\[$DELIM\]"
+      PS1+="$LIGHTCYAN$ICON_BEHIND$NUM_BEHIND$DELIM"
     fi
     
     local FLAGS=
     local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
     if ! git diff --quiet 2> /dev/null; then
-      # Unstaged changes.●
-      FLAGS+="\[$YELLOW\]*\[$DELIM\]"
+      # Unstaged changes.
+      FLAGS+="$YELLOW$ICON_UNSTAGED$DELIM"
     fi
     if ! git diff --cached --quiet 2> /dev/null; then
       # Staged changes.
-      FLAGS+="\[$LIGHTGREEN\]&\[$DELIM\]"
+      FLAGS+="$LIGHTRED$ICON_STAGED$DELIM"
     fi
     if [ -n $GIT_DIR ] && test -r $GIT_DIR/MERGE_HEAD; then
       # In the middle of a merge.
-      FLAGS+="\[$LIGHTRED\]Y\[$DELIM\]"
+      FLAGS+="$LIGHTRED$ICON_MERGING$DELIM"
     fi
     
     # Add flags.
     if [ "$FLAGS" != "" ]; then
       PS1+=" $FLAGS"
     fi
-    PS1+="\[$DELIM\])"
+    PS1+="$DELIM)"
 
     # Terminal title shows current repo.
     ROOT_PATH="$(git rev-parse --show-toplevel 2> /dev/null)"
@@ -133,7 +139,7 @@ update_prompt() {
   
   # Actual prompt.
   PS1+="\n"
-  if [ $LAST_RESULT = 0 ]; then
+  if [ $LAST_RESULT == 0 ]; then
     PS1+="\[$GREEN\]:o)"
   else
     PS1+="\[$RED\]:o("
