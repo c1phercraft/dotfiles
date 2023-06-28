@@ -25,8 +25,17 @@ fi
 # Local completion scripts
 [[ -f "${HOME}/.bash_completion" ]] && source "${HOME}/.bash_completion"
 
-# Define a few foreground colours
-NC="\[\033[0m\]"              # No color.
+# Color indices.
+BLACK_INDEX=0
+RED_INDEX=1
+GREEN_INDEX=2
+BROWN_INDEX=3
+BLUE_INDEX=4
+PURPLE_INDEX=5
+CYAN_INDEX=6
+DARKGRAY_INDEX=7
+
+# Foreground.
 BLACK="\[\033[0;30m\]"
 RED="\[\033[0;31m\]"
 GREEN="\[\033[0;32m\]"
@@ -35,6 +44,8 @@ BLUE="\[\033[0;34m\]"
 PURPLE="\[\033[0;35m\]"
 CYAN="\[\033[0;36m\]"
 DARKGRAY="\[\033[0;37m\]"
+
+# Bright foreground.
 LIGHTGRAY="\[\033[1;30m\]"
 LIGHTRED="\[\033[1;31m\]"
 LIGHTGREEN="\[\033[1;32m\]"
@@ -43,9 +54,21 @@ LIGHTBLUE="\[\033[1;34m\]"
 LIGHTPURPLE="\[\033[1;35m\]"
 LIGHTCYAN="\[\033[1;36m\]"
 WHITE="\[\033[1;37m\]"
+
+# Background.
+BG_BLACK="\[\033[0;40m\]"
+BG_RED="\[\033[0;41m\]"
+BG_GREEN="\[\033[0;42m\]"
+BG_BROWN="\[\033[0;43m\]"
+BG_BLUE="\[\033[0;44m\]"
+BG_PURPLE="\[\033[0;45m\]"
+BG_CYAN="\[\033[0;46m\]"
+BG_WHITE="\[\033[0;47m\]"
+
 BOLD="\[\033[1m\]"
-ITALIC="\[\033[3m\]"
+ITALIC="" #"\[\033[3m\]"
 UNDERLINE="\[\033[4m\]"
+NC="\[\033[39m\]\[\033[49m\]\[\033[0m\]"              # No color.
 
 # Set a fancy prompt (non-color, unless we know we "want" color)
 color_prompt=
@@ -70,26 +93,48 @@ set_title() {
   fi
 }
 
+combine() {
+  local fg=$1
+  local bg=$2
+  echo "\[\033[0;$((30+$fg));$((40+$bg))m\]"
+}
+
+split() {
+  local from_col=$1
+  local to_col=$2
+  local color=$(combine $from_col $to_col)
+  echo "$color◣$NC"
+}
+
+part() {
+  local fg=$1
+  local bg=$2
+  local next_bg=$3
+  local msg=$4
+  echo "$(combine $fg $bg)\j$(split $bg $next_bg)"
+}
+
 update_prompt() {
   local LAST_RESULT=$?
   local DELIM=$LIGHTGRAY
   
   # Day and time.
-  PS1="\n$DELIM($WHITE\D{%d~%H%M}$DELIM)"
+  PS1="\n$(combine $BLACK_INDEX $BLUE_INDEX)\D{%d~%H%M}$(split $BLUE_INDEX $DARKGRAY_INDEX)"
+  #PS1="\n$(part $BLACK_INDEX $BLUE_INDEX $DARKGRAY_INDEX '\D{%d~%H%M}')"
   # Number of jobs.
-  PS1+="-($WHITE\j$DELIM)"
+  PS1+="$(combine $BLACK_INDEX $DARKGRAY_INDEX)\j$(split $DARKGRAY_INDEX $BLUE_INDEX)"
   # User and host.
-  PS1+="-($WHITE\u$DELIM@$WHITE\h$DELIM)"
+  PS1+="$(combine $BLACK_INDEX $BLUE_INDEX)\u@\h$(split $BLUE_INDEX $BROWN_INDEX)"
   # Current working directory.
-  PS1+="-($YELLOW\w$DELIM)"
+  PS1+="$(combine 0 3)\w"
   
   if `git rev-parse --is-inside-work-tree 2> /dev/null`; then
     # Inside a Git repo, so add more information.
-    PS1+="-("
+    PS1+=$(split $BROWN_INDEX $GREEN_INDEX)
 
     # Git branch.
     BRANCH="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
-    PS1+="$LIGHTGREEN$ITALIC$BRANCH$NC"
+    PS1+="$BG_GREEN$BRANCH$(split $GREEN_INDEX $BLACK_INDEX)"
        
     local ICON_AHEAD='⇡'
     local ICON_BEHIND='⇣'
@@ -127,13 +172,13 @@ update_prompt() {
     if [ "$FLAGS" != "" ]; then
       PS1+=" $FLAGS"
     fi
-    PS1+="$DELIM)"
 
     # Terminal title shows current repo.
     ROOT_PATH="$(git rev-parse --show-toplevel 2> /dev/null)"
     ROOT_PATH=$(basename $ROOT_PATH)
     set_title $ROOT_PATH
   else
+    PS1+=$(split $BROWN_INDEX $BLACK_INDEX)
     set_title "Terminal"
   fi
   
