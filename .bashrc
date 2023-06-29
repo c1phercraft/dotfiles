@@ -115,7 +115,7 @@ slant() {
   local from_col=$1
   local to_col=$2
   local color=$(combine $from_col $to_col)
-  echo "$color◣$NC"
+  echo "$color◤$NC"
 }
 
 section() {
