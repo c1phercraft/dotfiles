@@ -146,44 +146,52 @@ update_prompt() {
 
     # Git branch.
     BRANCH="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
-    #PS1+="$BG_GREEN$BRANCH$(slant $GREEN_INDEX $DEFAULT_INDEX)"
-    PS1+="$BG_GREEN$BRANCH$NC$BG_CYAN"
+    PS1+="$BG_GREEN$BRANCH$NC"
        
     local ICON_AHEAD='⇡'
     local ICON_BEHIND='⇣'
-    local ICON_UNSTAGED='↥' #●
+    local ICON_UNSTAGED='↥'
     local ICON_STAGED='⤒'
     local ICON_MERGING='ᛣ'
+    local ICON_REBASING='⇈'
 
+    local FLAG_COLOR_INDEX=$CYAN_INDEX
+    local FLAGS=
     local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
     if [ $NUM_AHEAD -gt 0 ]; then
       # Commits that are not pushed to remote yet.
-      PS1+=" $ICON_AHEAD$NUM_AHEAD "
+      FLAGS+=" $ICON_AHEAD$NUM_AHEAD"
     fi
+
     local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
     if [ $NUM_BEHIND -gt 0 ]; then
       # Commits on remote that have not been pulled yet.
-      PS1+=" $ICON_BEHIND$NUM_BEHIND "
+      FLAGS+=" $ICON_BEHIND$NUM_BEHIND"
     fi
     
-    local FLAGS=
     local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
     if ! git diff --quiet 2> /dev/null; then
       # Unstaged changes.
-      FLAGS+="$ICON_UNSTAGED"
+      FLAGS+=" $ICON_UNSTAGED"
     fi
     if ! git diff --cached --quiet 2> /dev/null; then
       # Staged changes.
-      FLAGS+="$ICON_STAGED"
+      FLAGS+=" $ICON_STAGED"
+    fi
+    if git rebase --show-current-patch 2> /dev/null; then
+      # Rebase on-going.
+      FLAGS+=" $ICON_REBASING"
+      FLAG_COLOR_INDEX=$RED_INDEX
     fi
     if [ -n $GIT_DIR ] && test -r $GIT_DIR/MERGE_HEAD; then
       # In the middle of a merge.
-      FLAGS+="$ICON_MERGING"
+      FLAGS+=" $ICON_MERGING"
+      FLAG_COLOR_INDEX=$RED_INDEX
     fi
     
     # Add flags.
     if [ "$FLAGS" != "" ]; then
-      PS1+="$(combine $WHITE_INDEX $CYAN_INDEX)$FLAGS "
+      PS1+="$(slant $GREEN_INDEX $FLAG_COLOR_INDEX)$(combine $WHITE_INDEX $FLAG_COLOR_INDEX)$FLAGS "
     fi
 
     # Terminal title shows current repo.
