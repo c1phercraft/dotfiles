@@ -25,27 +25,62 @@ fi
 # Local completion scripts
 [[ -f "${HOME}/.bash_completion" ]] && source "${HOME}/.bash_completion"
 
-# Define a few foreground colours
-NC="\[\033[0m\]"              # No color.
-BLACK="\[\033[0;30m\]"
-RED="\[\033[0;31m\]"
-GREEN="\[\033[0;32m\]"
-BROWN="\[\033[0;33m\]"
-BLUE="\[\033[0;34m\]"
-PURPLE="\[\033[0;35m\]"
-CYAN="\[\033[0;36m\]"
-DARKGRAY="\[\033[0;37m\]"
-LIGHTGRAY="\[\033[1;30m\]"
-LIGHTRED="\[\033[1;31m\]"
-LIGHTGREEN="\[\033[1;32m\]"
-YELLOW="\[\033[1;33m\]"
-LIGHTBLUE="\[\033[1;34m\]"
-LIGHTPURPLE="\[\033[1;35m\]"
-LIGHTCYAN="\[\033[1;36m\]"
-WHITE="\[\033[1;37m\]"
+# Color indices.
+BLACK_INDEX=0
+RED_INDEX=1
+GREEN_INDEX=2
+BROWN_INDEX=3
+BLUE_INDEX=4
+PURPLE_INDEX=5
+CYAN_INDEX=6
+DARKGRAY_INDEX=7
+WHITE_INDEX=7
+DEFAULT_INDEX=9
+
+# Foreground.
+FG_BLACK="\[\033[0;30m\]"
+FG_RED="\[\033[0;31m\]"
+FG_GREEN="\[\033[0;32m\]"
+FG_BROWN="\[\033[0;33m\]"
+FG_BLUE="\[\033[0;34m\]"
+FG_PURPLE="\[\033[0;35m\]"
+FG_CYAN="\[\033[0;36m\]"
+FG_DARKGRAY="\[\033[0;37m\]"
+
+# Bright foreground.
+FG_GRAY_BRIGHT="\[\033[1;30m\]"
+FG_RED_BRIGHT="\[\033[1;31m\]"
+FG_GREEN_BRIGHT="\[\033[1;32m\]"
+FG_YELLOW_BRIGHT="\[\033[1;33m\]"
+FG_BLUE_BRIGHT="\[\033[1;34m\]"
+FG_PURPLE_BRIGHT="\[\033[1;35m\]"
+FG_CYAN_BRIGHT="\[\033[1;36m\]"
+FG_WHITE="\[\033[1;37m\]"
+
+# Background.
+BG_BLACK="\[\033[0;40m\]"
+BG_RED="\[\033[0;41m\]"
+BG_GREEN="\[\033[0;42m\]"
+BG_BROWN="\[\033[0;43m\]"
+BG_BLUE="\[\033[0;44m\]"
+BG_PURPLE="\[\033[0;45m\]"
+BG_CYAN="\[\033[0;46m\]"
+BG_DARKGRAY="\[\033[0;47m\]"
+
+# Bright background.
+BG_BLACK_BRIGHT="\[\033[1;40m\]"
+BG_RED_BRIGHT="\[\033[1;41m\]"
+BG_GREEN_BRIGHT="\[\033[1;42m\]"
+BG_BROWN_BRIGHT="\[\033[1;43m\]"
+BG_BLUE_BRIGHT="\[\033[1;44m\]"
+BG_PURPLE_BRIGHT="\[\033[1;45m\]"
+BG_CYAN_BRIGHT="\[\033[1;46m\]"
+BG_DARKGRAY_BRIGHT="\[\033[1;47m\]"
+
 BOLD="\[\033[1m\]"
-ITALIC="\[\033[3m\]"
+ITALIC="" #"\[\033[3m\]"
 UNDERLINE="\[\033[4m\]"
+NC="\[\033[39m\]\[\033[49m\]\[\033[0m\]"              # No color.
 
 # Set a fancy prompt (non-color, unless we know we "want" color)
 color_prompt=
@@ -70,81 +105,112 @@ set_title() {
   fi
 }
 
+combine() {
+  local fg=$1
+  local bg=$2
+  echo "\[\033[0;$((30+$fg));$((40+$bg))m\]"
+}
+
+slant() {
+  local from_col=$1
+  local to_col=$2
+  local color=$(combine $from_col $to_col)
+  echo "$color◤$NC"
+}
+
+section() {
+  local fg=$1
+  local bg=$2
+  local next_bg=$3
+  local msg=$4
+  echo "$(combine $fg $bg)$msg$(slant $bg $next_bg)"
+}
+
 update_prompt() {
   local LAST_RESULT=$?
-  local DELIM=$LIGHTGRAY
+  local DELIM=$FG_DARKGRAY
   
   # Day and time.
-  PS1="\n$DELIM($WHITE\D{%d~%H%M}$DELIM)"
+  PS1="\n$(section $BLACK_INDEX $DARKGRAY_INDEX $BLUE_INDEX '\D{%d}')"
+  PS1+="$(section $DARKGRAY_INDEX $BLUE_INDEX $DARKGRAY_INDEX '\D{%H%M}')"
   # Number of jobs.
-  PS1+="-($WHITE\j$DELIM)"
+  PS1+="$(section $BLACK_INDEX $DARKGRAY_INDEX $BLUE_INDEX '\j')"
   # User and host.
-  PS1+="-($WHITE\u$DELIM@$WHITE\h$DELIM)"
+  PS1+="$(section $DARKGRAY_INDEX $BLUE_INDEX $BROWN_INDEX '\u@\h')"
   # Current working directory.
-  PS1+="-($YELLOW\w$DELIM)"
+  PS1+="$(combine $BLACK_INDEX $BROWN_INDEX)\w"
   
   if `git rev-parse --is-inside-work-tree 2> /dev/null`; then
     # Inside a Git repo, so add more information.
-    PS1+="-("
+    PS1+=$(slant $BROWN_INDEX $GREEN_INDEX)
 
     # Git branch.
     BRANCH="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
-    PS1+="$LIGHTGREEN$ITALIC$BRANCH$NC"
+    PS1+="$BG_GREEN$BRANCH$NC"
        
     local ICON_AHEAD='⇡'
     local ICON_BEHIND='⇣'
-    local ICON_UNSTAGED='↥' #●
-    local ICON_STAGED='⤒'
+    local ICON_UNSTAGED='*'
+    local ICON_STAGED='↥' #'⤒'
     local ICON_MERGING='ᛣ'
+    local ICON_REBASING='⇈'
 
+    local FLAG_COLOR_INDEX=$CYAN_INDEX
+    local FLAGS=
     local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
     if [ $NUM_AHEAD -gt 0 ]; then
       # Commits that are not pushed to remote yet.
-      PS1+="$LIGHTRED$ICON_AHEAD$NUM_AHEAD$DELIM"
+      FLAGS+=" $ICON_AHEAD$NUM_AHEAD"
     fi
+
     local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
     if [ $NUM_BEHIND -gt 0 ]; then
       # Commits on remote that have not been pulled yet.
-      PS1+="$LIGHTCYAN$ICON_BEHIND$NUM_BEHIND$DELIM"
+      FLAGS+=" $ICON_BEHIND$NUM_BEHIND"
     fi
     
-    local FLAGS=
     local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
     if ! git diff --quiet 2> /dev/null; then
       # Unstaged changes.
-      FLAGS+="$YELLOW$ICON_UNSTAGED$DELIM"
+      FLAGS+=" $ICON_UNSTAGED"
     fi
     if ! git diff --cached --quiet 2> /dev/null; then
       # Staged changes.
-      FLAGS+="$LIGHTRED$ICON_STAGED$DELIM"
+      FLAGS+=" $ICON_STAGED"
+    fi
+    if git rebase --show-current-patch 2> /dev/null; then
+      # Rebase on-going.
+      FLAGS+=" $ICON_REBASING"
+      FLAG_COLOR_INDEX=$RED_INDEX
     fi
     if [ -n $GIT_DIR ] && test -r $GIT_DIR/MERGE_HEAD; then
       # In the middle of a merge.
-      FLAGS+="$LIGHTRED$ICON_MERGING$DELIM"
+      FLAGS+=" $ICON_MERGING"
+      FLAG_COLOR_INDEX=$RED_INDEX
     fi
     
     # Add flags.
     if [ "$FLAGS" != "" ]; then
-      PS1+=" $FLAGS"
+      PS1+="$(slant $GREEN_INDEX $FLAG_COLOR_INDEX)$(combine $WHITE_INDEX $FLAG_COLOR_INDEX)$FLAGS "
     fi
-    PS1+="$DELIM)"
 
     # Terminal title shows current repo.
     ROOT_PATH="$(git rev-parse --show-toplevel 2> /dev/null)"
     ROOT_PATH=$(basename $ROOT_PATH)
     set_title $ROOT_PATH
   else
+    PS1+=' '
     set_title "Terminal"
   fi
   
   # Actual prompt.
-  PS1+="\n"
+  PS1+="$NC\n"
   if [ $LAST_RESULT == 0 ]; then
-    PS1+="\[$GREEN\]:o)"
+    PS1+="$FG_GREEN:o)"
   else
-    PS1+="\[$RED\]:o("
+    PS1+="$FG_RED:o("
   fi
-  PS1+="\[$DELIM\]\$\[$NC\] "
+  PS1+="$DELIM\$$NC "
 }
 
 if [ "$color_prompt" = "yes" ]; then
