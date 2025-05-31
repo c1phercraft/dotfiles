@@ -1,0 +1,125 @@
+#
+# Git aliases.
+#
+
+# Aliases starting with '!command ...' are run in the root of the repo.
+
+# List all aliases.
+git config --global alias.alias "!git config --get-regexp ^alias\. | sed -e s/^alias\.// -e s/\ /\ =\ /"
+git config --global alias.co 'checkout'
+git config --global alias.com 'checkout master'
+git config --global alias.cob 'checkout -b'
+git config --global alias.c 'commit -m'
+git config --global alias.amend 'commit --amend'
+# Short status overview.
+git config --global alias.s 'status --short --branch'
+# Unstage files already staged.
+git config --global alias.unstage 'reset -q HEAD --'
+# Get rid of any changes you made.
+git config --global alias.discard 'checkout --'
+# Sync your current branch with the master one.
+git config --global alias.msync '!git fetch -p origin && git rebase origin/master'
+# Sync your fork with the upstream one.
+git config --global alias.fsync '!git fetch --all -p && git checkout master && git rebase upstream/master && git push origin master'
+# Sync your current branch with any other branch.
+git config --global alias.bsync '!git fetch origin && git rebase'
+# Prunes refs to deleted remote branches.
+#git config --global alias.prune "!git fetch -p && for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do echo 'Pruning $branch'; git branch -D $branch; done"
+
+# Push to and create current branch on remote.
+git config --global alias.pushup 'push -u origin HEAD'
+
+# Check staged changes before committing.
+git config --global alias.precommit 'diff --cached --diff-algorithm=minimal -w'
+# Better diff output.
+git config --global alias.d 'diff'
+# Open directory diff in difftool.
+#broken? git config --global alias.ddiff 'difftool --dir-diff'
+# Show difference since/from branch point.
+git config --global alias.dm 'diff origin/master...'
+# Show difference with previous version in repo, aka last change.
+git config --global alias.dp 'diff HEAD@{1}'
+# Show files touched since/from branch point.
+git config --global alias.touched 'diff --name-status origin/master... --'
+
+# Find files in repo.
+git config --global alias.ff '!git ls-files | grep -sI --color=auto'
+# Find text in files in repo.
+git config --global alias.fsh '!git grep -nE --heading --break'
+git config --global alias.fs '!git grep -nE'
+# Find text in commit message history.
+git config --global alias.fc 'log --pretty="format:%C(bold green)%h%C(reset) - %C(dim white)%an%C(reset) - %C(white)%s%C(reset)" --name-status --grep'
+
+# %d - Branch
+# %h - SHA1
+# %s - Summary
+# %an - Name of committer
+# %ar - Relative time
+
+# List commits as a tree.
+git config --global alias.tree 'log --graph --abbrev-commit --decorate --date=relative --format=format:"%C(bold green)%h%C(reset) - %C(bold blue)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --all'
+# List commits as a bush, so key commits only to see branch history.
+git config --global alias.bush 'log --graph --abbrev-commit --decorate --simplify-by-decoration --date=relative --format=format:"%C(bold green)%h%C(reset) - %C(bold blue)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --all'
+
+# List commits, in short notation.
+git config --global alias.ls 'log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --date=short'
+# List last 20 commits, in short notation.
+git config --global alias.lh '!git ls --color=always|head -20'
+# List commits, also showing files touched.
+git config --global alias.ll 'log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --date=short --decorate --stat'
+# List commits, also showing commit body text.
+git config --global alias.la 'log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(dim white)%an%C(reset)%C(bold yellow)%d%C(reset) %B" --date=short'
+# List commits, that match the given text; case-insensitive.
+git config --global alias.search '!f() { git log --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ad%C(reset) %C(dim white)%an%C(reset)%C(bold yellow)%d%C(reset) %B" --date=short --grep "$@"i -i; }; f'
+
+# List untracked files in current dir.
+git config --global alias.lfu 'ls-files --others'
+
+# List reflog, in short notation.
+git config --global alias.rs 'reflog --format=format:"%C(bold green)%h%C(reset) %C(bold blue)%gD%C(reset) %C(white)%gs%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
+# List last 20 reflogs, in short notation.
+git config --global alias.rh '!git rs --color=always|head -20'
+# List reflogs, also showing files touched.
+git config --global alias.rl 'reflog --format=format:"%C(bold green)%h%C(reset) %C(bold blue)%gD%C(reset) %C(white)%gs%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --stat'
+
+# Sort branches on most recent first.
+git config --global alias.br '!git branch --sort=-authordate --format="%(authordate:short) %(refname:short) %(upstream:track)" | grep -v master | awk "ADDON=\"\"; / \[gone\]/{ADDON=\" --GONE--\"}; {print \$1 \" \" \$2 ADDON}"'
+
+# List commit history of a single file.
+git config --global alias.h 'log --oneline --follow --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ar%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
+# List files with conflicts
+git config --global alias.conflicts 'diff --name-only --diff-filter=U'
+# List number of commits per user.
+git config --global alias.stats 'shortlog -sn --no-merges'
+
+# Run Vim for a file path, starting at root of repo.
+git config --global alias.vi '!vim'
+
+##### Other Settings ##################################################
+
+# Sort branches to show most recently changed branch first.
+git config --global branch.sort '-committerdate'
+
+# Remember login information.
+git config --global credential.helper cache
+git config --global credential.helper 'cache --timeout=36000'
+
+# Fix line endings.
+git config --global core.autocrlf input
+
+# Use main as master branch from now on.
+git config --global init.defaultBranch main
+
+# Setup merge tool.
+git config --global merge.tool p4mergetool
+git config --global mergetool.p4mergetool.cmd "/usr/local/bin/p4merge \$PWD/\$BASE \$PWD/\$LOCAL \$PWD/\$REMOTE \$PWD/\$MERGED"
+git config --global mergetool.p4mergetool.trustExitCode false
+git config --global mergetool.keepBackup false
+
+# Grep colors.
+#git config --global color.grep.filename brightgreen
+#git config --global color.grep.linenumber brightblack
+#git config --global color.grep.match blue bold
+#git config --global color.grep.separator brightblack
+
+# vim: ft=sh
