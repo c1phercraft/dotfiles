@@ -266,7 +266,7 @@ if [ -d $HOME/.nvm ]; then
 fi
 
 # To work with my dotfile repo.
-alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dgit='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # ---------- non-manual additions below -------------------------------
 
