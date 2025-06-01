@@ -32,12 +32,15 @@ settitle()
 netinfo()
 {
     echo "--------------- Network Information ---------------"
-    /sbin/ifconfig | awk /'inet addr/ {print $2}'
-    /sbin/ifconfig | awk /'Bcast/ {print $3}'
-    /sbin/ifconfig | awk /'inet addr/ {print $4}'
-    /sbin/ifconfig | awk /'HWaddr/ {print $4,$5}'
-    myip=`lynx -dump -hiddenlinks=ignore -nolist http://checkip.dyndns.org:8245/ | sed '/^$/d; s/^[ ]*//g; s/[ ]*$//g' `
-    echo "${myip}"
+    ip_info=$(/usr/sbin/ip -o -f inet address | grep ' brd ')
+    internal_ip=$(echo $ip_info | awk '{print $4}')
+    broadcast_ip=$(echo $ip_info | awk '{print $6}')
+    mac_addr=$(/usr/sbin/ip -o -f inet -br link | awk /' UP / {print $3}')
+    echo "Internal IP : ${internal_ip}"
+    echo "Broadcast IP: ${broadcast_ip}"
+    echo "MAC/HW addr : ${mac_addr}"
+    external_ip=$(curl -s http://checkip.dyndns.org:8245/ | sed -n 's/.*Current IP Address: \([0-9.]*\).*/\1/p')
+    echo "External IP : ${external_ip}"
     echo "---------------------------------------------------"
 }
 
