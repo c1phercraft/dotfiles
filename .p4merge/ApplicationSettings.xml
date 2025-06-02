@@ -25,7 +25,7 @@
  <Bool varName="InlineDiffsEnabled">true</Bool>
  <String varName="LineEnding">Unix</String>
  <PropertyList IsManaged="TRUE" varName="PreferencesDialog">
-  <ByteArray varName="WindowGeometry">AdnQywADAAAAAAH3AAAAjgAABM4AAAP+AAAB9wAAAKgAAATOAAAD/gAAAAAAAAAAB4AAAAH3AAAAqAAABM4AAAP+</ByteArray>
+  <ByteArray varName="WindowGeometry">AdnQywADAAAAAAt5AAAB7QAADhgAAAVKAAALegAAAgMAAA4XAAAFSQAAAAAAAAAACgAAAAt6AAACAwAADhcAAAVJ</ByteArray>
  </PropertyList>
  <Bool varName="ShowTabsSpaces">false</Bool>
  <Bool varName="TabInsertsSpaces">true</Bool>
@@ -33,8 +33,8 @@
  <PropertyList IsManaged="TRUE" varName="Windows">
   <PropertyList IsManaged="TRUE" varName="Diff">
    <Bool varName="DiffCombined">false</Bool>
-   <ByteArray varName="WindowGeometry">AdnQywADAAAAAAAAAAAAGAAAB38AAAQ3AAAAAAAAADIAAAIrAAADUQAAAAACAAAAB4AAAAAAAAAAMQAAB38AAAQ2</ByteArray>
-   <ByteArray varName="WindowState">AAAA/wAAAAD9AAAAAAAAB4AAAAPMAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAiAE0AYQBpAG4AVwBpAG4AZABvAHcAVABvAG8AbABiAGEAcgEAAAAA/////wAAAAAAAAAA</ByteArray>
+   <ByteArray varName="WindowGeometry">AdnQywADAAAAAAeAAAAAGAAAEX8AAAWfAAAJ4gAAARkAAAwNAAACwAAAAAACAAAACgAAAAeAAAAAMQAAEX8AAAWf</ByteArray>
+   <ByteArray varName="WindowState">AAAA/wAAAAD9AAAAAAAACgAAAAU1AAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAEAAAAiAE0AYQBpAG4AVwBpAG4AZABvAHcAVABvAG8AbABiAGEAcgEAAAAA/////wAAAAAAAAAA</ByteArray>
   </PropertyList>
   <PropertyList IsManaged="TRUE" varName="Merge">
    <Bool varName="ShowBase">true</Bool>
