@@ -90,9 +90,9 @@ update_prompt() {
   PS1+="\[$FG_BROWN\]$START_CAP\[$FG_BLACK$BG_BROWN\]\w\[$NC$FG_BROWN\]$END_CAP"
   
   if `git rev-parse --is-inside-work-tree 2> /dev/null`; then
-    #    act ∙ there are untracked files? ∴
+    # x  act ∙ there are untracked files? ∴
     # x  act ⇧ modified files
-    #    act × deleted files without using git rm
+    # x  act × deleted files without using git rm
     # x  act ⬆ there are staged files / files can be committed
     #        --v
     # x        ⌅ rebase in progress
@@ -109,8 +109,10 @@ update_prompt() {
     # x      ↓ number of commits behind
     # x       current_branch
 
+    local ICON_UNTRACKED='∙'
     local ICON_UNSTAGED='⇧' #↥
     local ICON_STAGED='⬆' #⤒
+    local ICON_DELETED='×'
     local ICON_MERGING='⌆' #ᛣ
     local ICON_REBASING='⌅' #⇈
     local ICON_AHEAD='↑' #⇡
@@ -122,7 +124,7 @@ update_prompt() {
     local ICON_DIVERGED='⌥'
     local ICON_FF='»'
 
-    add_part() {
+    add_state() {
       local icon=$1
       local is_active=$2
       local suffix="${3:-}"
@@ -135,21 +137,31 @@ update_prompt() {
       PS1+=" $icon$suffix"
     }
 
+    add_action() {
+      local BUP=$ACTIVE
+      ACTIVE="\[$FG_RED_BRIGHT\]"
+      add_state $@
+      ACTIVE="\[$BUP\]"
+    }
+
     # Set local colors.
     local ACTIVE="\[$FG_GREEN_BRIGHT\]"
     local INACTIVE="\[$FG_BLACK\]"
     PS1+="\[$NC$FG_DARKGRAY\]$START_CAP\[$NC$FG_WHITE$BG_DARKGRAY\]"
 
     # Inside a Git repo, so add more information.
-    local GIT_DIR="$(git rev-parse --git-dir 2> /dev/null)"
+    local GIT_DIR=$(git rev-parse --git-dir 2> /dev/null)
+    local STATUS=$(git status --porcelain 2> /dev/null)
 
-    if ! git diff --quiet 2> /dev/null; then local HAS_UNSTAGED=true; fi
-    if ! git diff --cached --quiet 2> /dev/null; then local HAS_STAGED=true; fi
+    if [[ $STATUS =~ ($'\n'|^)\?\? ]]; then local HAS_UNTRACKED=true; fi
+    if [[ $STATUS =~ ($'\n'|^).M ]]; then local HAS_UNSTAGED=true; fi
+    if [[ $STATUS =~ ($'\n'|^)[MAD] ]]; then local HAS_STAGED=true; fi
+    if [[ $STATUS =~ ($'\n'|^).D ]]; then local HAS_DELETED=true; fi
     if git rebase --show-current-patch 2> /dev/null; then local IS_REBASING=true; fi
     if [[ -n $GIT_DIR && -r "$GIT_DIR/MERGE_HEAD" ]]; then local IS_MERGING=true; fi
 
     # Commits that are not pushed to remote yet.
-    local NUM_AHEAD="$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')"
+    local NUM_AHEAD=$(git log --oneline @{u}.. 2> /dev/null | wc -l | tr -d ' ')
     if [ $NUM_AHEAD -gt 0 ]; then
       local IS_AHEAD=true
     else
@@ -157,7 +169,7 @@ update_prompt() {
     fi
 
     # Commits on remote that have not been pulled yet.
-    local NUM_BEHIND="$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')"
+    local NUM_BEHIND=$(git log --oneline ..@{u} 2> /dev/null | wc -l | tr -d ' ')
     if [ $NUM_BEHIND -gt 0 ]; then
       local IS_BEHIND=true
     else
@@ -165,7 +177,7 @@ update_prompt() {
     fi
 
     # Local branch.
-    local BRANCH="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
+    local BRANCH=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
     if [[ $BRANCH == 'HEAD' ]]; then local IS_DETACHED=true; fi
     # Remote branch.
     local REMOTE_BRANCH=$(git rev-parse --symbolic-full-name --abbrev-ref @{upstream} 2> /dev/null)
@@ -173,44 +185,44 @@ update_prompt() {
     local NEEDS_REBASE=$(git config --get branch.$BRANCH.rebase 2> /dev/null)
 
     # Construct the prompt.
-    add_part $ICON_UNSTAGED $HAS_UNSTAGED
-    add_part $ICON_STAGED $HAS_STAGED
+    add_state $ICON_UNTRACKED $HAS_UNTRACKED
+    add_state $ICON_UNSTAGED $HAS_UNSTAGED
+    if [[ -n $HAS_DELETED ]]; then
+      add_action $ICON_DELETED $HAS_DELETED
+    else
+      add_state $ICON_DELETED $HAS_DELETED
+    fi
+    add_state $ICON_STAGED $HAS_STAGED
     if [[ -n $IS_REBASING || -n $IS_MERGING ]]; then
       # Only show one of the states: rebasing or merging.
       if [[ -n $IS_REBASING ]]; then
-        add_part $ICON_REBASING $IS_REBASING
+        add_state $ICON_REBASING $IS_REBASING
       else
-        add_part $ICON_MERGING $IS_MERGING
+        add_state $ICON_MERGING $IS_MERGING
       fi
     fi
     PS1+="\[$INACTIVE\] " # Separating local from remote territory.
-    add_part $ICON_AHEAD $IS_AHEAD $NUM_AHEAD
+    add_state $ICON_AHEAD $IS_AHEAD $NUM_AHEAD
     if [[ -n $IS_DETACHED ]]; then
-      local BUP=$ACTIVE
-      ACTIVE="\[$FG_RED_BRIGHT\]"
-      add_part $ICON_DETACHED true
-      ACTIVE="\[$BUP\]"
+      add_action $ICON_DETACHED true
     elif [[ -n $IS_AHEAD && -n $IS_BEHIND ]]; then
-      local BUP=$ACTIVE
-      ACTIVE="\[$FG_RED_BRIGHT\]"
-      add_part $ICON_DIVERGED true
-      ACTIVE="\[$BUP\]"
+      add_action $ICON_DIVERGED true
     elif [[ -n $IS_BEHIND && ! -n $NEEDS_REBASE ]]; then
-        add_part $ICON_FF true
+        add_state $ICON_FF true
     elif [[ -n $HAS_REMOTE_BRANCH ]]; then
       if [[ -n $IS_AHEAD ]]; then
-        add_part $ICON_PUSH true
+        add_state $ICON_PUSH true
       else
-        add_part $ICON_REMOTE
+        add_state $ICON_REMOTE
       fi
     else
-      add_part $ICON_LOCAL
+      add_state $ICON_LOCAL
     fi
-    add_part $ICON_BEHIND $IS_BEHIND $NUM_BEHIND
+    add_state $ICON_BEHIND $IS_BEHIND $NUM_BEHIND
     PS1+="\[$INACTIVE\]  \[$ITALIC\]$BRANCH \[$NC$FG_DARKGRAY\]$END_CAP" # 
 
     # Terminal title shows current repo.
-    local ROOT_PATH="$(git rev-parse --show-toplevel 2> /dev/null)"
+    local ROOT_PATH=$(git rev-parse --show-toplevel 2> /dev/null)
     ROOT_PATH=$(basename $ROOT_PATH)
     set_title $ROOT_PATH
   else
