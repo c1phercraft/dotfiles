@@ -35,7 +35,7 @@ colorscheme evening
 set background=dark
 syntax enable              " enable syntax processing
 filetype indent plugin on  " enable file type detection
-hi Normal guifg=lightgray guibg=black ctermfg=lightgray ctermbg=black
+hi Normal guifg=lightgray guibg=black ctermfg=lightgray ctermbg=NONE
 hi Visual guifg=black guibg=lightgray ctermfg=black ctermbg=lightgray
 "hi Comment guifg=DarkGreen ctermfg=DarkGreen
 "hi Constant guifg=LightRed ctermfg=LightRed
