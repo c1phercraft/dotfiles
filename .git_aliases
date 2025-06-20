@@ -6,8 +6,9 @@
 
 # List all aliases.
 git config --global alias.alias "!git config --get-regexp ^alias\. | sed -e s/^alias\.// -e s/\ /\ =\ /"
+git config --global alias.trunk "!git branch --list main master | awk '{print $NF}'"
 git config --global alias.co 'checkout'
-git config --global alias.com 'checkout master'
+git config --global alias.com "checkout $(git trunk)"
 git config --global alias.cob 'checkout -b'
 git config --global alias.c 'commit -m'
 git config --global alias.amend 'commit --amend'
@@ -17,10 +18,10 @@ git config --global alias.s 'status --short --branch'
 git config --global alias.unstage 'reset -q HEAD --'
 # Get rid of any changes you made.
 git config --global alias.discard 'checkout --'
-# Sync your current branch with the master one.
-git config --global alias.msync '!git fetch -p origin && git rebase origin/master'
+# Sync your current branch with the main one.
+git config --global alias.msync "!git fetch -p origin && git rebase origin/$(git trunk)"
 # Sync your fork with the upstream one.
-git config --global alias.fsync '!git fetch --all -p && git checkout master && git rebase upstream/master && git push origin master'
+git config --global alias.fsync "!git fetch --all -p && git checkout $(git trunk) && git rebase upstream/$(git trunk) && git push origin $(git trunk)"
 # Sync your current branch with any other branch.
 git config --global alias.bsync '!git fetch origin && git rebase'
 # Prunes refs to deleted remote branches.
@@ -36,11 +37,11 @@ git config --global alias.d 'diff'
 # Open directory diff in difftool.
 #broken? git config --global alias.ddiff 'difftool --dir-diff'
 # Show difference since/from branch point.
-git config --global alias.dm 'diff origin/master...'
+git config --global alias.dm "diff origin/$(git trunk)..."
 # Show difference with previous version in repo, aka last change.
 git config --global alias.dp 'diff HEAD@{1}'
 # Show files touched since/from branch point.
-git config --global alias.touched 'diff --name-status origin/master... --'
+git config --global alias.touched "diff --name-status origin/$(git trunk)... --"
 
 # Find files in repo.
 git config --global alias.ff '!git ls-files | grep -sI --color=auto'
@@ -83,7 +84,7 @@ git config --global alias.rh '!git rs --color=always|head -20'
 git config --global alias.rl 'reflog --format=format:"%C(bold green)%h%C(reset) %C(bold blue)%gD%C(reset) %C(white)%gs%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)" --stat'
 
 # Sort branches on most recent first.
-git config --global alias.br '!git branch --sort=-authordate --format="%(authordate:short) %(refname:short) %(upstream:track)" | grep -v master | awk "ADDON=\"\"; / \[gone\]/{ADDON=\" --GONE--\"}; {print \$1 \" \" \$2 ADDON}"'
+git config --global alias.br "!git branch --sort=-authordate --format='%(authordate:short) %(refname:short) %(upstream:track)' | grep -v $(git trunk) | awk 'ADDON=\"\"; / \[gone\]/{ADDON=\" --GONE--\"}; {print \$1 \" \" \$2 ADDON}'"
 
 # List commit history of a single file.
 git config --global alias.h 'log --oneline --follow --format=format:"%C(bold green)%h%C(reset) %C(bold blue)~%ar%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)"'
@@ -107,7 +108,7 @@ git config --global credential.helper 'cache --timeout=36000'
 # Fix line endings.
 git config --global core.autocrlf input
 
-# Use main as master branch from now on.
+# Use main as master branch (trunk) from now on.
 git config --global init.defaultBranch main
 
 # Setup merge tool.
