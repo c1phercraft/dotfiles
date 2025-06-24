@@ -31,12 +31,14 @@ relevant_branches() {
 key_of() {
     local -n hashmap=$1
     local value=$2
+    local result=""
     for key in "${!hashmap[@]}"; do
         if [[ "${hashmap[$key]}" == "$value" ]]; then
-            echo $key
-            break
+            # Taking the last kay, assuming it's the most recent, and therefore relevant, one.
+            result=$key
         fi
     done
+    echo $result
 }
 
 # Returns a string, defining the state of the first argument, compared to the second.
@@ -83,7 +85,7 @@ for branch in $branches; do
 done
 
 # Determine topological order of commits to get to the current HEAD state.
-ordered_shas=$(git rev-list --topo-order --reverse --abbrev-commit -$branch_count ${forked[@]} 2> /dev/null | grep -E "$(echo ${forked[@]} | tr ' ' '|')")
+ordered_shas=$(git rev-list --topo-order --reverse --abbrev-commit HEAD 2> /dev/null | grep -E "$(echo ${forked[@]} | tr ' ' '|')")
 declare -i count
 declare -a order
 count=0
