@@ -5,6 +5,7 @@
 # - The history of branch-off points.
 # - How much ahead those previous branches are.
 # - A list of summaries of ahead commits in previous branches.
+# - The upstream for each branch.
 # - Whether there are untracked files.
 # - Whether there are uncommitted staged changes.
 
@@ -47,10 +48,12 @@ branch_count=$(echo $branches | wc -w)
 declare -A branch_name
 declare -A behind
 declare -A forked
+declare -A upstream
 for branch in $branches; do
     branch_name[$branch]=$branch
     forked[$branch]=$(git rev-parse --short $(git merge-base ${branch_name[$branch]} HEAD) 2> /dev/null)
     behind[$branch]=$(git log --oneline ${forked[$branch]}..$branch 2> /dev/null | wc -l)
+    upstream[$branch]=$(git rev-parse --abbrev-ref $branch@{upstream} 2> /dev/null)
 done
 
 # Determine topological order of commits to get to the current HEAD state.
@@ -86,7 +89,12 @@ for branch in ${order[@]}; do
     fi
     
     # Branch name.
-    line+="$FG_BROWN$TXT_BOLD($branch)$TXT_NC"
+    line+="$FG_BROWN$TXT_BOLD($branch"
+    remote=${upstream[$branch]}
+    if [[ -n $remote ]]; then
+        line+=" ◆ $remote"
+    fi
+    line+=")$TXT_NC"
     
     printf "$line\n"
     
