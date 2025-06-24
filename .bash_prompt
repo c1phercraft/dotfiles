@@ -5,50 +5,7 @@
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
-# Foreground.
-FG_BLACK="$(tput setaf 0)"
-FG_RED="$(tput setaf 1)"
-FG_GREEN="$(tput setaf 2)"
-FG_BROWN="$(tput setaf 3)"
-FG_BLUE="$(tput setaf 4)"
-FG_PURPLE="$(tput setaf 5)"
-FG_CYAN="$(tput setaf 6)"
-FG_LIGHTGRAY="$(tput setaf 7)"
-
-# Bright foreground.
-FG_DARKGRAY="$(tput setaf 8)"
-FG_RED_BRIGHT="$(tput setaf 9)"
-FG_GREEN_BRIGHT="$(tput setaf 10)"
-FG_BROWN_BRIGHT="$(tput setaf 11)"
-FG_BLUE_BRIGHT="$(tput setaf 12)"
-FG_PURPLE_BRIGHT="$(tput setaf 13)"
-FG_CYAN_BRIGHT="$(tput setaf 14)"
-FG_WHITE="$(tput setaf 15)"
-
-# Background.
-BG_BLACK="$(tput setab 0)"
-BG_RED="$(tput setab 1)"
-BG_GREEN="$(tput setab 2)"
-BG_BROWN="$(tput setab 3)"
-BG_BLUE="$(tput setab 4)"
-BG_PURPLE="$(tput setab 5)"
-BG_CYAN="$(tput setab 6)"
-BG_LIGHTGRAY="$(tput setab 7)"
-
-# Bright background.
-BG_DARKGRAY="$(tput setab 8)"
-BG_RED_BRIGHT="$(tput setab 9)"
-BG_GREEN_BRIGHT="$(tput setab 10)"
-BG_BROWN_BRIGHT="$(tput setab 11)"
-BG_BLUE_BRIGHT="$(tput setab 12)"
-BG_PURPLE_BRIGHT="$(tput setab 13)"
-BG_CYAN_BRIGHT="$(tput setab 14)"
-BG_LIGHTGRAY_BRIGHT="$(tput setab 15)"
-
-BOLD="$(tput bold)"
-ITALIC="$(tput sitm)"
-UNDERLINE="$(tput smul)"
-NC="$(tput sgr0)"  # No color.
+source ~/.bash_colors
 
 # Set a fancy prompt (non-color, unless we know we "want" color)
 color_prompt=
@@ -77,17 +34,17 @@ update_prompt() {
   local END_CAP=''
   
   # Day and time.
-  PS1="\n\[$FG_LIGHTGRAY\]$START_CAP\[$NC$FG_BLACK$BG_LIGHTGRAY\]\D{%d}\[$NC$FG_LIGHTGRAY\]$END_CAP"
-  PS1+="\[$FG_BLUE\]$START_CAP\[$FG_BLACK$BG_BLUE\]\D{%H%M}\[$NC$FG_BLUE\]$END_CAP"
+  PS1="\n\[$FG_LIGHTGRAY\]$START_CAP\[$TXT_NC$FG_BLACK$BG_LIGHTGRAY\]\D{%d}\[$TXT_NC$FG_LIGHTGRAY\]$END_CAP"
+  PS1+="\[$FG_BLUE\]$START_CAP\[$FG_BLACK$BG_BLUE\]\D{%H%M}\[$TXT_NC$FG_BLUE\]$END_CAP"
 
   # Number of jobs.
-  PS1+="\[$FG_LIGHTGRAY\]$START_CAP\[$FG_BLACK$BG_LIGHTGRAY\]\j\[$NC$FG_LIGHTGRAY\]$END_CAP"
+  PS1+="\[$FG_LIGHTGRAY\]$START_CAP\[$FG_BLACK$BG_LIGHTGRAY\]\j\[$TXT_NC$FG_LIGHTGRAY\]$END_CAP"
 
   # User and host.
-  PS1+="\[$FG_BLUE\]$START_CAP\[$FG_BLACK$BG_BLUE\]\u@\h\[$NC$FG_BLUE\]$END_CAP"
+  PS1+="\[$FG_BLUE\]$START_CAP\[$FG_BLACK$BG_BLUE\]\u@\h\[$TXT_NC$FG_BLUE\]$END_CAP"
 
   # Current working directory.
-  PS1+="\[$FG_BROWN\]$START_CAP\[$FG_BLACK$BG_BROWN\]\w\[$NC$FG_BROWN\]$END_CAP"
+  PS1+="\[$FG_BROWN\]$START_CAP\[$FG_BLACK$BG_BROWN\]\w\[$TXT_NC$FG_BROWN\]$END_CAP"
   
   if `git rev-parse --is-inside-work-tree 2> /dev/null`; then
     # x  act ∙ there are untracked files? ∴
@@ -147,7 +104,7 @@ update_prompt() {
     # Set local colors.
     local ACTIVE="\[$FG_GREEN_BRIGHT\]"
     local INACTIVE="\[$FG_BLACK\]"
-    PS1+="\[$NC$FG_DARKGRAY\]$START_CAP\[$NC$FG_WHITE$BG_DARKGRAY\]"
+    PS1+="\[$TXT_NC$FG_DARKGRAY\]$START_CAP\[$TXT_NC$FG_WHITE$BG_DARKGRAY\]"
 
     # Inside a Git repo, so add more information.
     local GIT_DIR=$(git rev-parse --git-dir 2> /dev/null)
@@ -219,7 +176,7 @@ update_prompt() {
       add_state $ICON_LOCAL
     fi
     add_state $ICON_BEHIND $IS_BEHIND $NUM_BEHIND
-    PS1+="\[$INACTIVE\]  \[$ITALIC\]$BRANCH \[$NC$FG_DARKGRAY\]$END_CAP" # 
+    PS1+="\[$INACTIVE\]  \[$TXT_ITALIC\]$BRANCH \[$TXT_NC$FG_DARKGRAY\]$END_CAP" # 
 
     # Terminal title shows current repo.
     local ROOT_PATH=$(git rev-parse --show-toplevel 2> /dev/null)
@@ -230,13 +187,13 @@ update_prompt() {
   fi
   
   # Actual prompt.
-  PS1+="$NC\n"
+  PS1+="$TXT_NC\n"
   if [ $LAST_RESULT == 0 ]; then
     PS1+="\[$FG_GREEN\]:o)"
   else
     PS1+="\[$FG_RED\]:o("
   fi
-  PS1+="\[$FG_GRAY_BRIGHT\]\$\[$NC\] "
+  PS1+="\[$FG_GRAY_BRIGHT\]\$\[$TXT_NC\] "
 }
 
 if [ "$color_prompt" = "yes" ]; then

@@ -1,0 +1,52 @@
+#
+# Bash color definitions.
+#
+
+# If not running interactively, don't do anything
+[[ "$-" != *i* ]] && return
+
+# Foreground.
+export FG_BLACK="$(tput setaf 0)"
+export FG_RED="$(tput setaf 1)"
+export FG_GREEN="$(tput setaf 2)"
+export FG_BROWN="$(tput setaf 3)"
+export FG_BLUE="$(tput setaf 4)"
+export FG_PURPLE="$(tput setaf 5)"
+export FG_CYAN="$(tput setaf 6)"
+export FG_LIGHTGRAY="$(tput setaf 7)"
+
+# Bright foreground.
+export FG_DARKGRAY="$(tput setaf 8)"
+export FG_RED_BRIGHT="$(tput setaf 9)"
+export FG_GREEN_BRIGHT="$(tput setaf 10)"
+export FG_BROWN_BRIGHT="$(tput setaf 11)"
+export FG_BLUE_BRIGHT="$(tput setaf 12)"
+export FG_PURPLE_BRIGHT="$(tput setaf 13)"
+export FG_CYAN_BRIGHT="$(tput setaf 14)"
+export FG_WHITE="$(tput setaf 15)"
+
+# Background.
+export BG_BLACK="$(tput setab 0)"
+export BG_RED="$(tput setab 1)"
+export BG_GREEN="$(tput setab 2)"
+export BG_BROWN="$(tput setab 3)"
+export BG_BLUE="$(tput setab 4)"
+export BG_PURPLE="$(tput setab 5)"
+export BG_CYAN="$(tput setab 6)"
+export BG_LIGHTGRAY="$(tput setab 7)"
+
+# Bright background.
+export BG_DARKGRAY="$(tput setab 8)"
+export BG_RED_BRIGHT="$(tput setab 9)"
+export BG_GREEN_BRIGHT="$(tput setab 10)"
+export BG_BROWN_BRIGHT="$(tput setab 11)"
+export BG_BLUE_BRIGHT="$(tput setab 12)"
+export BG_PURPLE_BRIGHT="$(tput setab 13)"
+export BG_CYAN_BRIGHT="$(tput setab 14)"
+export BG_LIGHTGRAY_BRIGHT="$(tput setab 15)"
+
+export TXT_BOLD="$(tput bold)"
+export TXT_ITALIC="$(tput sitm)"
+export TXT_UNDERLINE="$(tput smul)"
+export TXT_NC="$(tput sgr0)"  # No color.
+
