@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+
+# Git script to show the current state of your branch:
+# - Which branch you are on.
+# - The history of branch-off points.
+# - How much ahead those previous branches are.
+# - A list of summaries of ahead commits in previous branches.
+# - Whether there are untracked files.
+# - Whether there are uncommitted staged changes.
+
+source ~/.bash_colors
+
+[[ " $* " == *" -s "* ]] && short=true
+
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Returns the name of the main trunk: main OR master.
+get_trunk() {
+    git branch --list main master | awk '{print $NF}'
+}
+
+# Returns all parent branches of the HEAD, including itself.
+relevant_branches() {
+	# This will list the parent branches up to, but not including, main/master.
+	# Order is by date of last commit on the branch, so it may not be in order of branching!
+	git branch --format="%(refname:short)" --contains `git rev-parse HEAD~1` --sort=-creatordate 2> /dev/null
+}
+
+# Returns the key of the given value that's part of the given hashmap.
+key_of() {
+    local -n hashmap=$1
+    local value=$2
+    for key in "${!hashmap[@]}"; do
+        if [[ "${hashmap[$key]}" == "$value" ]]; then
+            echo $key
+            break
+        fi
+    done
+}
+
+# Collect all relevant branches.
+trunk=$(get_trunk)
+branches="$trunk $(relevant_branches)"
+branch_count=$(echo $branches | wc -w)
+
+# Collect branch information.
+declare -A branch_name
+declare -A behind
+declare -A forked
+for branch in $branches; do
+    branch_name[$branch]=$branch
+    forked[$branch]=$(git rev-parse --short $(git merge-base ${branch_name[$branch]} HEAD) 2> /dev/null)
+    behind[$branch]=$(git log --oneline ${forked[$branch]}..$branch 2> /dev/null | wc -l)
+done
+
+# Determine topological order of commits to get to the current HEAD state.
+ordered_shas=$(git rev-list --topo-order --reverse --abbrev-commit -$branch_count ${forked[@]} 2> /dev/null | grep -E "$(echo ${forked[@]} | tr ' ' '|')")
+declare -i count
+declare -a order
+count=0
+for sha in $ordered_shas; do
+    order[$count]=$(key_of forked $sha)
+    count+=1
+done
+
+# Pretty print output.
+indent_size=$((${#forked[$current_branch]} - 1))
+count=0
+for branch in ${order[@]}; do
+    if [[ $count = 0 ]]; then
+        # Trunk.
+        printf -v indent "% *s" $((2 + $indent_size)) ""
+        line="⟶ "
+    else
+        # Branch.
+        line="$indent╰⟶ "
+        printf -v indent "% *s" $((5 + ($count + 1) * $indent_size)) ""
+    fi
+    
+    # Fork point SHA.
+    line+="$FG_GREEN$TXT_BOLD${forked[$branch]}$TXT_NC "
+    
+    if [[ $branch != $current_branch ]]; then
+        # How many commits behind on this branch?
+        line+="⟶ +${behind[$branch]} "
+    fi
+    
+    # Branch name.
+    line+="$FG_BROWN$TXT_BOLD($branch)$TXT_NC"
+    
+    printf "$line\n"
+    
+    if [[ -z $short ]]; then
+        # List of commits that the current branch is behind.
+        commits=$(git log --pretty=format:"$indent│    ├─ $FG_GREEN%h$TXT_NC $FG_WHITE%s$TXT_NC - $FG_DARKGRAY%an$TXT_NC" ${forked[$branch]}..$branch 2> /dev/null)
+        if [[ -n $commits ]]; then
+            printf "${commits%├─*}╰⟶${commits##*├─}\n"
+        fi
+    fi
+
+    count+=1
+done
+
+# Some less important end notes.
+if [[ -n "$(git ls-files -m)" ]]; then
+    echo "${FG_DARKGRAY}NOTE: there are unstaged modified files.$TXT_NC"
+fi
+
+if [[ -n "$(git diff-index --cached HEAD)" ]]; then
+    echo "${FG_DARKGRAY}NOTE: there are staged but uncommitted files.$TXT_NC"
+fi
+
