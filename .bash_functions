@@ -16,7 +16,7 @@ log_error() {
     printf "${FG_RED}✖  %s${NC}\n" "$@"
 }
 log_warning() {
-    printf "${FG_BROWN}➜  %s${NC}\n" "$@"
+    printf "${FG_YELLOW}➜  %s${NC}\n" "$@"
 }
 log_note() {
     printf "${BOLD}${FG_BLUE_BRIGHT}Note:${NC}  ${FG_BLUE_BRIGHT}%s${NC}\n" "$@"

@@ -150,14 +150,14 @@ for branch in ${order[@]}; do
     fi
     
     # Branch, compared to fork point.
-    line+="$FG_BROWN$TXT_BOLD($branch$(behind_ahead ${forked[$branch]} $branch)"
+    line+="$FG_YELLOW$TXT_BOLD($branch$(behind_ahead $branch ${forked[$branch]})"
     
     # Branch, compared to remote.
     remote_branch=${remote[$branch]}
     if [[ -n $remote_branch ]]; then
-        line+=" ◆ $FG_BLUE$remote_branch$(behind_ahead $remote_branch $branch)"
+        line+="$TXT_NC ◆ $FG_CYAN$remote_branch$(behind_ahead $branch $remote_branch)"
     fi
-    line+="$FG_BROWN$TXT_BOLD)$TXT_NC"
+    line+="$FG_YELLOW$TXT_BOLD)$TXT_NC"
     
     # Branch status line done.
     printf "$line\n"

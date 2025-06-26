@@ -44,7 +44,7 @@ update_prompt() {
   PS1+="\[$FG_BLUE\]$START_CAP\[$FG_BLACK$BG_BLUE\]\u@\h\[$TXT_NC$FG_BLUE\]$END_CAP"
 
   # Current working directory.
-  PS1+="\[$FG_BROWN\]$START_CAP\[$FG_BLACK$BG_BROWN\]\w\[$TXT_NC$FG_BROWN\]$END_CAP"
+  PS1+="\[$FG_YELLOW\]$START_CAP\[$FG_BLACK$BG_YELLOW\]\w\[$TXT_NC$FG_YELLOW\]$END_CAP"
   
   if `git rev-parse --is-inside-work-tree 2> /dev/null`; then
     # x  act ∙ there are untracked files? ∴
