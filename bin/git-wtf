@@ -43,14 +43,34 @@ key_of() {
 
 # Returns a string, defining the state of the first argument, compared to the second.
 behind_ahead() {
+    # Situation                 Fork Point	Upstream Branch	Remote Branch   Show as
+    # -------------------------+-----------+---------------+---------------+-----------------
+    # Ahead of Fork Point	    Ahead	    --	            --              -99 at fork point
+    # Synced with Fork Point	Synced	    --	            --              <nothing>
+    # Behind Fork Point	        Behind	    --	            --              +99 at fork point
+    # Ahead of Upstream	        --	        Ahead	        --              
+    # Behind Upstream	        --	        Behind	        --              
+    # Ahead and Behind Upstream	--	        Diverged	    --              DIVERGED UPSTREAM
+    # Synced with Upstream	    --	        Synced	        --              <nothing>
+    # No Upstream Configured	--	        None	        --              <nothing>
+    # Ahead of Remote	        --	        --	            Ahead           
+    # Behind Remote	            --	        --	            Behind          
+    # Ahead and Behind Remote	--	        --	            Diverged        DIVERGED REMOTE
+    # Synced with Remote	    --	        --	            Synced          <nothing>
+    # No Remote Branch Exists	--	        --	            None            <nothing>
+    # Detached HEAD	            Detached	--	            --              DETACHED
+    # No Commits Yet	        None	    None	        None            <nothing>
+    # Branch Deleted on Remote	--	        Deleted	        Deleted         
+
     local first=$1
     local second=$2
-    local colon="$TXT_NC:"
+    if [[ "${3:-true}" == "true" ]]; then
+        local colon="$TXT_NC:"
+    fi
     read behind ahead <<< $(git rev-list --left-right --count $first...$second 2> /dev/null)
     if [[ behind -eq 0 ]]; then
         if [[ ahead -eq 0 ]]; then
             # 0|0 = synched
-#            echo "$colon${FG_GREEN_BRIGHT}SYNC$TXT_NC"
             echo ""
         else
             # 0|+ = ahead
@@ -61,8 +81,15 @@ behind_ahead() {
             # +|0 = behind
             echo "$colon-$behind"
         else
-            # +|+ = diverged
-            echo "$colon${FG_RED}DIVERGED$TXT_NC"
+            # +|+ = may be diverged
+            if [[ -n $(git rev-list $second --not $(git merge-base $first $second)
+) ]]; then
+                # Not diverged, can FF to second branch.
+                echo "$colon+$ahead"
+            else
+                # Yep, diverged.
+                echo "$colon${FG_RED}DIVERGED $behind $ahead $TXT_NC"
+            fi
         fi
     fi
 }
@@ -122,40 +149,25 @@ for branch in ${order[@]}; do
         printf -v indent "% *s" $((($count * 3) + ($count + 1) * $indent_size)) ""
     fi
     
+    if [[ -n $upstream_branch ]]; then
+        line+="$(behind_ahead $upstream_branch $branch false) ⟶ "
+    fi
+    
     # Fork point SHA.
     line+="$FG_GREEN$TXT_BOLD${forked[$branch]}$TXT_NC "
     
-    # Situation                 Fork Point	Upstream Branch	Remote Branch   Show as
-    # -------------------------+-----------+---------------+---------------+-------
-    # Ahead of Fork Point	    Ahead	    --	            --              -99 at fork point
-    # Synced with Fork Point	Synced	    --	            --              <nothing>
-    # Behind Fork Point	        Behind	    --	            --              +99 at fork point
-    # Ahead of Upstream	        --	        Ahead	        --              
-    # Behind Upstream	        --	        Behind	        --              
-    # Ahead and Behind Upstream	--	        Diverged	    --              DIVERGED UPSTREAM
-    # Synced with Upstream	    --	        Synced	        --              <nothing>
-    # No Upstream Configured	--	        None	        --              <nothing>
-    # Ahead of Remote	        --	        --	            Ahead           
-    # Behind Remote	            --	        --	            Behind          
-    # Ahead and Behind Remote	--	        --	            Diverged        DIVERGED REMOTE
-    # Synced with Remote	    --	        --	            Synced          <nothing>
-    # No Remote Branch Exists	--	        --	            None            <nothing>
-    # Detached HEAD	            Detached	--	            --              DETACHED
-    # No Commits Yet	        None	    None	        None            <nothing>
-    # Branch Deleted on Remote	--	        Deleted	        Deleted         
-
     if [[ $branch != $current_branch ]]; then
         # How many commits behind on this branch?
         line+="⟶ "
     fi
     
     # Branch, compared to fork point.
-    line+="$FG_YELLOW$TXT_BOLD($branch$(behind_ahead $branch ${forked[$branch]})"
+    line+="$FG_YELLOW$TXT_BOLD($branch$TXT_NC$(behind_ahead $branch ${forked[$branch]})"
     
     # Branch, compared to remote.
     remote_branch=${remote[$branch]}
     if [[ -n $remote_branch ]]; then
-        line+="$TXT_NC ◆ $FG_CYAN$remote_branch$(behind_ahead $branch $remote_branch)"
+        line+="$TXT_NC ⟶ $FG_CYAN$remote_branch$TXT_NC$(behind_ahead $branch $remote_branch)"
     fi
     line+="$FG_YELLOW$TXT_BOLD)$TXT_NC"
     
