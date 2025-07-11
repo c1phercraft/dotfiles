@@ -176,7 +176,7 @@ update_prompt() {
       add_state $ICON_LOCAL
     fi
     add_state $ICON_BEHIND $IS_BEHIND $NUM_BEHIND
-    PS1+="\[$INACTIVE\]  \[$TXT_ITALIC\]$BRANCH \[$TXT_NC$FG_DARKGRAY\]$END_CAP" # 
+    PS1+="\[$INACTIVE\]  \[$TXT_ITALIC$ACTIVE\]$BRANCH \[$TXT_NC$FG_DARKGRAY\]$END_CAP" # 
 
     # Terminal title shows current repo.
     local ROOT_PATH=$(git rev-parse --show-toplevel 2> /dev/null)
