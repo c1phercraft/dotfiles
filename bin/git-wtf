@@ -13,6 +13,21 @@ source ~/.bash_colors
 
 [[ " $* " == *" -s "* ]] && short=true
 
+supports_chars=$(fc-list :charset=2570,27f6,251c)
+if [[ -n $supports_chars ]]; then
+    # Special characters are supported.
+    arrow_token='⟶'
+    item_token='├─'
+    last_item_token='╰─'
+    no_item_token='│'
+else
+    # Special characters not supported; use ASCII art instead.
+    arrow_token='->'
+    item_token='|--'
+    last_item_token='`--'
+    no_item_token='|'
+fi
+
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 
 # Returns the name of the main trunk: main OR master.
@@ -34,14 +49,14 @@ key_of() {
     local result=""
     for key in "${!hashmap[@]}"; do
         if [[ "${hashmap[$key]}" == "$value" ]]; then
-            # Taking the last kay, assuming it's the most recent, and therefore relevant, one.
+            # Taking the last key, assuming it's the most recent, and therefore relevant, one.
             result=$key
         fi
     done
     echo $result
 }
 
-# Returns a string, defining the state of the first argument, compared to the second.
+# Returns a string, showing the number of commits that the first branch is ahead or behind the second one.
 behind_ahead() {
     # Situation                 Fork Point	Upstream Branch	Remote Branch   Show as
     # -------------------------+-----------+---------------+---------------+-----------------
@@ -134,23 +149,18 @@ for branch in ${order[@]}; do
     #       ╰⟶ cdee44e ⟶ +1 (B:
     #                │    ╰─ f:3e54c More changes on B - Author
     #                ╰⟶ f540184 (A)
-    #
-    # count=0:  6 -> 1 * 6 + 0 * 3 =  6
-    # count=1: 15 -> 2 * 6 + 1 * 3 = 15
-    # count=2: 24 -> 3 * 6 + 2 * 3 = 24
-    # step_size=9 -> (count + 1) * indent_size, +(count * 3) if count != 0
     if [[ $count = 0 ]]; then
         # Trunk.
         line=""
         printf -v indent "% *s" $indent_size ""
     else
         # Branch.
-        line="$indent╰⟶ "
+        line="$indent$last_item_token$arrow_token "
         printf -v indent "% *s" $((($count * 3) + ($count + 1) * $indent_size)) ""
     fi
     
     if [[ -n $upstream_branch ]]; then
-        line+="$(behind_ahead $upstream_branch $branch false) ⟶ "
+        line+="$(behind_ahead $upstream_branch $branch false) $arrow_token "
     fi
     
     # Fork point SHA.
@@ -158,7 +168,7 @@ for branch in ${order[@]}; do
     
     if [[ $branch != $current_branch ]]; then
         # How many commits behind on this branch?
-        line+="⟶ "
+        line+="$arrow_token "
     fi
     
     # Branch, compared to fork point.
@@ -167,7 +177,7 @@ for branch in ${order[@]}; do
     # Branch, compared to remote.
     remote_branch=${remote[$branch]}
     if [[ -n $remote_branch ]]; then
-        line+="$TXT_NC ⟶ $FG_CYAN$remote_branch$TXT_NC$(behind_ahead $branch $remote_branch)"
+        line+="$TXT_NC $arrow_token $FG_CYAN$remote_branch$TXT_NC$(behind_ahead $branch $remote_branch)"
     fi
     line+="$FG_YELLOW$TXT_BOLD)$TXT_NC"
     
@@ -176,9 +186,11 @@ for branch in ${order[@]}; do
     
     if [[ -z $short ]]; then
         # List of commits that the current branch is behind.
-        commits=$(git log --pretty=format:"$indent│    ├─ $FG_GREEN%h$TXT_NC $FG_WHITE%s$TXT_NC - $FG_DARKGRAY%an$TXT_NC" ${forked[$branch]}..$branch 2> /dev/null)
+        gap_size=$((3 + ${#arrow_token}))
+        gap=$(printf %${gap_size}s)
+        commits=$(git log --pretty=format:"$indent$no_item_token$gap$item_token $FG_GREEN%h$TXT_NC $FG_WHITE%s$TXT_NC - $FG_DARKGRAY%an$TXT_NC" ${forked[$branch]}..$branch 2> /dev/null)
         if [[ -n $commits ]]; then
-            printf "${commits%├─*}╰─${commits##*├─}\n"
+            printf "${commits%$item_token*}$last_item_token${commits##*$item_token}\n"
         fi
     fi
 
