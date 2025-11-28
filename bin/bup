@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+# Make all relative paths work as expected.
+cd $HOME
+
+# 1) Configuration
+#export RESTIC_REPOSITORY="/media/$USER/vault/backup"
+INCLUDE_FILE="bin/bup-include.txt"
+EXCLUDE_FILE="bin/bup-exclude.txt"
+REPO_FILE="bin/bup-repo.txt" # file that contains the repository path (first, non-comment line)
+if [ -f "$REPO_FILE" ]; then
+    # read first non-empty, non-comment line; trim spaces
+    RESTIC_REPOSITORY="$(
+        grep -v '^[[:space:]]*$' "$REPO_FILE" |
+            grep -v '^[[:space:]]*#' |
+            head -n1 | tr -d '\r' |
+            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+    )"
+    if [ -z "$RESTIC_REPOSITORY" ]; then
+        echo "Error: repository file $REPO_FILE is empty or only comments." >&2
+        exit 1
+    fi
+    export RESTIC_REPOSITORY
+else
+    echo "Error: repository file not found: $REPO_FILE" >&2
+    exit 1
+fi
+
+# 2) Sanity checks
+if ! command -v restic >/dev/null 2>&1; then
+    echo "Error: restic is not installed or not in PATH." >&2
+    exit 1
+fi
+
+BASEDIR="$(dirname "$RESTIC_REPOSITORY")"
+if [ ! -d "$BASEDIR" ]; then
+    echo "Error: $RESTIC_REPOSITORY (or its parent directory) does not exist. Is the external drive mounted?" >&2
+    exit 1
+fi
+
+# 3) Ask for the password once (not echoed) and export to env
+read -rs -p "Restic repository password: " RESTIC_PASSWORD
+echo
+export RESTIC_PASSWORD
+
+# 4) Initialize repository if needed
+if [ ! -d "$RESTIC_REPOSITORY" ] || [ -z "$(ls -A "$RESTIC_REPOSITORY" 2>/dev/null)" ]; then
+    mkdir -p "$RESTIC_REPOSITORY"
+    restic init
+else
+    # Verify we can access the repo with the provided password
+    if ! restic cat config >/dev/null 2>&1; then
+        echo "Error: Cannot access repository at $RESTIC_REPOSITORY (wrong password or not a restic repo?)." >&2
+        exit 1
+    fi
+fi
+
+# 5) Build backup command
+BACKUP_CMD=(restic backup --tag "$(hostname)" --exclude-caches)
+if [ -f "$EXCLUDE_FILE" ]; then
+    BACKUP_CMD+=(--exclude-file "$EXCLUDE_FILE")
+fi
+BACKUP_CMD+=(--exclude-if-present ".nobackup")
+if [ -f "$INCLUDE_FILE" ]; then
+    BACKUP_CMD+=(--files-from "$INCLUDE_FILE")
+else
+    echo "Error: include sources file not found: $INCLUDE_FILE" >&2
+    exit 1
+fi
+
+# 6) Run backup
+echo "Starting backup to $RESTIC_REPOSITORY ..."
+"${BACKUP_CMD[@]}"
+
+# 7) Apply retention policy and prune
+
+# Retention policy
+KEEP_DAILY=7
+KEEP_WEEKLY=4
+KEEP_MONTHLY=12
+
+echo "Applying retention policy (daily=$KEEP_DAILY, weekly=$KEEP_WEEKLY, monthly=$KEEP_MONTHLY) ..."
+restic forget --prune \
+    --keep-daily "$KEEP_DAILY" \
+    --keep-weekly "$KEEP_WEEKLY" \
+    --keep-monthly "$KEEP_MONTHLY"
+
+# 8) Show recent snapshots
+#echo "Recent snapshots:"
+#restic snapshots --latest 5
+
+echo "Backup completed successfully."
+
+#######################################################################
+# OLD IMPLEMENTATION BELOW
+
+# -a                archive mode is -rlptgoD (no -A,-X,-U,-N,-H)
+#   -r              recurse into directories
+#   -l              copy symlinks as symlinks
+#   -p              preserve permissions
+#   -t              preserve modification times
+#   -g              preserve group
+#   -o              preserve owner (super-user only)
+#   -D              same as --devices --specials
+#     --devices     preserve device files (super-user only)
+#     --specials    preserve special files
+# -x                don't cross filesystem boundaries
+# -P                same as --partial --progress
+#   --partial       keep partially transferred files
+#   --progress      show progress during transfer
+# -u                skip files that are newer on the receiver
+#sudo rsync -axPu --info=progress2 --exclude-from=$HOME/bin/bup-exclude.txt --delete $HOME/ $@/
