@@ -22,8 +22,11 @@
 - If a comment in code starts with a capital letter, it should end with a dot.
 - The `run_in_terminal` tool sometimes fails to capture the command output. If 
   that happens, use the `get_terminal_output` tool to retrieve the last
-  command output from the terminal. If that fails, ask the user to copy-paste
+  command output from the terminal. If that fails, ask me to copy-paste
   the output from the terminal.
 - If you must use the terminal, and the previous bullet point still fails, 
   append `2>&1 | tee -a /tmp/copilot.out` and then read/summarize `/tmp/copilot.
   out`; you can use any other temporary filename to store the output in.
+- If you find you are running in a loop, stop and summarize the work done 
+  so far, and ask me how to proceed.
+- If you need to ask me something, do so. Do not assume anything.
