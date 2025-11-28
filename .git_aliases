@@ -6,7 +6,7 @@
 
 # List all aliases.
 git config --global alias.alias "!git config --get-regexp ^alias\. | sed -e s/^alias\.// -e s/\ /\ =\ /"
-git config --global alias.trunk "!git branch --list main master | awk '{print $NF}' | sed -e 's/^\*\s*//'"
+git config --global alias.trunk "!git branch --list main master | awk '{print \$NF}'"
 git config --global alias.co 'checkout'
 git config --global alias.com "checkout $(git trunk)"
 git config --global alias.cob 'checkout -b'
