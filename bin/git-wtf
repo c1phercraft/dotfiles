@@ -37,9 +37,9 @@ get_trunk() {
 
 # Returns all parent branches of the HEAD, including itself.
 relevant_branches() {
-	# This will list the parent branches up to, but not including, main/master.
-	# Order is by date of last commit on the branch, so it may not be in order of branching!
-	git branch --format="%(refname:short)" --contains `git rev-parse HEAD~1` --sort=-creatordate 2> /dev/null
+    # This will list the parent branches up to, but not including, main/master.
+    # Order is by date of last commit on the branch, so it may not be in order of branching!
+    git branch --format="%(refname:short)" --contains $(git rev-parse HEAD~1) --sort=-creatordate 2>/dev/null
 }
 
 # Returns the key of the given value that's part of the given hashmap.
@@ -63,47 +63,57 @@ behind_ahead() {
     # Ahead of Fork Point	    Ahead	    --	            --              -99 at fork point
     # Synced with Fork Point	Synced	    --	            --              <nothing>
     # Behind Fork Point	        Behind	    --	            --              +99 at fork point
-    # Ahead of Upstream	        --	        Ahead	        --              
-    # Behind Upstream	        --	        Behind	        --              
+    # Ahead of Upstream	        --	        Ahead	        --
+    # Behind Upstream	        --	        Behind	        --
     # Ahead and Behind Upstream	--	        Diverged	    --              DIVERGED UPSTREAM
     # Synced with Upstream	    --	        Synced	        --              <nothing>
     # No Upstream Configured	--	        None	        --              <nothing>
-    # Ahead of Remote	        --	        --	            Ahead           
-    # Behind Remote	            --	        --	            Behind          
+    # Ahead of Remote	        --	        --	            Ahead
+    # Behind Remote	            --	        --	            Behind
     # Ahead and Behind Remote	--	        --	            Diverged        DIVERGED REMOTE
     # Synced with Remote	    --	        --	            Synced          <nothing>
     # No Remote Branch Exists	--	        --	            None            <nothing>
     # Detached HEAD	            Detached	--	            --              DETACHED
     # No Commits Yet	        None	    None	        None            <nothing>
-    # Branch Deleted on Remote	--	        Deleted	        Deleted         
+    # Branch Deleted on Remote	--	        Deleted	        Deleted
 
     local first=$1
     local second=$2
     if [[ "${3:-true}" == "true" ]]; then
         local colon="$TXT_NC:"
     fi
-    read behind ahead <<< $(git rev-list --left-right --count $first...$second 2> /dev/null)
+    read behind ahead <<<$(git rev-list --left-right --count $first...$second 2>/dev/null)
     if [[ behind -eq 0 ]]; then
         if [[ ahead -eq 0 ]]; then
             # 0|0 = synched
             echo ""
         else
             # 0|+ = ahead
-            echo "$colon+$ahead"
+            if git merge-base --is-ancestor $first $second 2>/dev/null; then
+                #echo "$colon»${ahead}"
+                echo "»${ahead}"
+            else
+                #echo "$colon+$ahead"
+                echo "+$ahead"
+            fi
         fi
     else
         if [[ ahead -eq 0 ]]; then
             # +|0 = behind
-            echo "$colon-$behind"
+            #echo "$colon-$behind"
+            echo "-$behind"
         else
             # +|+ = may be diverged
-            if [[ -n $(git rev-list $second --not $(git merge-base $first $second)
-) ]]; then
+            if [[ -n $(
+                git rev-list $second --not $(git merge-base $first $second)
+            ) ]]; then
                 # Not diverged, can FF to second branch.
-                echo "$colon+$ahead"
+                #echo "$colon+$ahead"
+                echo "+$ahead"
             else
                 # Yep, diverged.
-                echo "$colon${FG_RED}DIVERGED $behind $ahead $TXT_NC"
+                #echo "$colon${FG_RED}DIVERGED $behind $ahead $TXT_NC"
+                echo " ${FG_RED}DIVERGED $behind $ahead $TXT_NC"
             fi
         fi
     fi
@@ -121,13 +131,13 @@ declare -A forked
 declare -A remote
 for branch in $branches; do
     branch_name[$branch]=$branch
-    forked[$branch]=$(git rev-parse --short $(git merge-base ${branch_name[$branch]} HEAD) 2> /dev/null)
-    behind[$branch]=$(git log --oneline ${forked[$branch]}..$branch 2> /dev/null | wc -l)
-    remote[$branch]=$(git rev-parse --abbrev-ref $branch@{upstream} 2> /dev/null)
+    forked[$branch]=$(git rev-parse --short $(git merge-base ${branch_name[$branch]} HEAD) 2>/dev/null)
+    behind[$branch]=$(git log --oneline ${forked[$branch]}..$branch 2>/dev/null | wc -l)
+    remote[$branch]=$(git rev-parse --abbrev-ref $branch@{upstream} 2>/dev/null)
 done
 
 # Determine topological order of commits to get to the current HEAD state.
-ordered_shas=$(git rev-list --topo-order --reverse --abbrev-commit HEAD 2> /dev/null | grep -E "$(echo ${forked[@]} | tr ' ' '|')")
+ordered_shas=$(git rev-list --topo-order --reverse --abbrev-commit HEAD 2>/dev/null | grep -E "$(echo ${forked[@]} | tr ' ' '|')")
 declare -i count
 declare -a order
 count=0
@@ -158,37 +168,37 @@ for branch in ${order[@]}; do
         line="$indent$last_item_token$arrow_token "
         printf -v indent "% *s" $((($count * 3) + ($count + 1) * $indent_size)) ""
     fi
-    
+
     if [[ -n $upstream_branch ]]; then
         line+="$(behind_ahead $upstream_branch $branch false) $arrow_token "
     fi
-    
+
     # Fork point SHA.
     line+="$FG_GREEN$TXT_BOLD${forked[$branch]}$TXT_NC "
-    
+
     if [[ $branch != $current_branch ]]; then
         # How many commits behind on this branch?
         line+="$arrow_token "
     fi
-    
+
     # Branch, compared to fork point.
-    line+="$FG_YELLOW$TXT_BOLD($branch$TXT_NC$(behind_ahead $branch ${forked[$branch]})"
-    
+    line+="($FG_YELLOW$TXT_BOLD$branch$TXT_NC$(behind_ahead $branch ${forked[$branch]})"
+
     # Branch, compared to remote.
     remote_branch=${remote[$branch]}
     if [[ -n $remote_branch ]]; then
         line+="$TXT_NC $arrow_token $FG_CYAN$remote_branch$TXT_NC$(behind_ahead $branch $remote_branch)"
     fi
-    line+="$FG_YELLOW$TXT_BOLD)$TXT_NC"
-    
+    line+="$FG_YELLOW$TXT_BOLD$TXT_NC)"
+
     # Branch status line done.
     printf "$line\n"
-    
+
     if [[ -z $short ]]; then
         # List of commits that the current branch is behind.
         gap_size=$((3 + ${#arrow_token}))
         gap=$(printf %${gap_size}s)
-        commits=$(git log --pretty=format:"$indent$no_item_token$gap$item_token $FG_GREEN%h$TXT_NC $FG_WHITE%s$TXT_NC - $FG_DARKGRAY%an$TXT_NC" ${forked[$branch]}..$branch 2> /dev/null)
+        commits=$(git log --pretty=format:"$indent$no_item_token$gap$item_token $FG_GREEN%h$TXT_NC $FG_WHITE%s$TXT_NC - $FG_DARKGRAY%an$TXT_NC" ${forked[$branch]}..$branch 2>/dev/null)
         if [[ -n $commits ]]; then
             printf "${commits%$item_token*}$last_item_token${commits##*$item_token}\n"
         fi
@@ -206,4 +216,3 @@ fi
 if [[ -n "$(git diff-index --cached HEAD)" ]]; then
     echo "${FG_DARKGRAY}NOTE: there are staged but uncommitted files.$TXT_NC"
 fi
-
