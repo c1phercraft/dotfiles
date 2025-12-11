@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+sudo dpkg --set-selections < ~/bin/bup-pkg-list.txt
+sudo apt-get -u dselect-upgrade
+sudo apt-clone restore-new-distro ~/bin/bup.apt-clone.tar.gz
+

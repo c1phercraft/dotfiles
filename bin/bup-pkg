@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+deborphan -a --no-show-section | tee ~/bin/bup-pkg-list.txt
+apt-clone clone ~/bin/bup
+

@@ -23,7 +23,7 @@ snap/firefox/common/.cache
 #
 ## some history files
 #.python_history
-#.bash_history
+.bash_history
 #
 ## Python eggs
 #.local/lib/python*
