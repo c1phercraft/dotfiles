@@ -9,11 +9,12 @@ have() { command -v "$1" >/dev/null 2>&1; }
 
 list_serial_ttys() {
   ls /dev/tty* 2>/dev/null | sort -V || true
+#  ls /dev/* 2>/dev/null | sort -V || true
 }
 
 tty_props() {
   local tty="$1"
-  # Try udevadm for rich properties; fallback to sysfs
+  # Try udevadm for rich properties; fallback to sysfs.
   if have udevadm; then
     udevadm info -q property -n "$tty" 2>/dev/null || true
   else
@@ -36,13 +37,13 @@ tty_props() {
 }
 
 tty_to_wine_com() {
-  # Map a TTY device to its Wine COM port(s)
-  # Wine creates dosdevices/comX symlinks pointing to the real TTY devices
+  # Map a TTY device to its Wine COM port(s).
+  # Wine creates dosdevices/comX symlinks pointing to the real TTY devices.
   local tty="$1"
   local real_tty
   real_tty="$(readlink -f "$tty" 2>/dev/null || echo "$tty")"
   
-  # Check common Wine prefix locations
+  # Check common Wine prefix locations.
   local wine_dirs=(
     "$HOME/.wine/dosdevices"
   )
@@ -77,25 +78,25 @@ main() {
   mapfile -t ttys < <(list_serial_ttys)
   
   if [ "${#ttys[@]}" -eq 0 ]; then
-    echo "No serial devices found." >&2
+    echo "No serial devices found. Weird..." >&2
     exit 0
   fi
   
   for tty in "${ttys[@]}"; do
     local props vendor mod wine_com
-    echo -ne "$tty\r"
+    echo -ne "$tty          \r"
     props="$(tty_props "$tty")"
     vendor="$(printf "%s" "$props" | awk -F= '/^ID_VENDOR=/{print $2}' | head -n1)"
     model="$(printf "%s" "$props" | awk -F= '/^ID_MODEL=/{print $2}' | head -n1)"
     
-    # Skip devices without vendor or model information
+    # Skip devices without vendor or model information.
     if [ -z "$vendor" ] || [ -z "$model" ]; then
       continue
     fi
     
     wine_com="$(tty_to_wine_com "$tty" || echo "")"
     
-    # Format output
+    # Format output.
     if [ -n "$wine_com" ]; then
       printf "%s * %s * %s * %s\n" "$tty" "$vendor" "$model" "$wine_com"
     else
@@ -103,7 +104,7 @@ main() {
     fi
   done
 
-  # Print space over the last echoed TTY progress line.
+  # Print spaces over the last echoed TTY progress line.
   echo -ne "$(printf '%*s' "${#tty}" '')\r"
 }
 
