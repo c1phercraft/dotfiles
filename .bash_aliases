@@ -14,7 +14,6 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias path='echo -e ${PATH//:/\\n}'  		# Show the path as a list of paths.
 
-alias version='lsb_release -a;cat /sys/devices/virtual/dmi/id/product_name'   # Version information.
 alias kbfix='setxkbmap -layout us'          # Make sure typing quotes works as expected.
 
 alias prettyxml='xmllint --format --xmlout --nsclean'   # Prettify an XML file.

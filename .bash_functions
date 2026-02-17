@@ -69,4 +69,40 @@ keys() {
     xfconf-query -c xfce4-keyboard-shortcuts -l -v | cut -d'/' -f4 | awk '{printf "%30s", $2; print "\t" $1}' | sort | uniq
 }
 
+version() {
+  # OS + machine info
+  lsb_release -a 2>/dev/null
+  cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null || true
+  echo
+
+  # Monitor info (Model, Size, Diagonal)
+  hwinfo --monitor | awk '
+    # When Model: line is found
+    /Model:/ {
+      s=$0
+      sub(/.*Model: "/,"",s)
+      sub(/".*/,"",s)
+      model=s
+    }
+
+    # When Size: line is found
+    /Size:/ {
+      s=$0
+      sub(/.*Size: */,"",s)
+      # Extract mm values for diagonal calculation
+      split(s, dims, " ")
+      w_mm = dims[1]
+      h_mm = dims[3]
+
+      # Convert mm → inches
+      w_in = w_mm / 25.4
+      h_in = h_mm / 25.4
+      diag = sqrt(w_in*w_in + h_in*h_in)
+
+      # Print final line
+      printf "%s - %s (%.1f\")\n", model, s, diag
+    }
+  '
+}
+
 # vim: ft=sh
