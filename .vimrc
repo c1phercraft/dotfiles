@@ -1,7 +1,7 @@
 """""""""
 " Startup
 set nocompatible        " Forget Vi...
-set ttymouse=xterm2     " makes it work in everything
+set ttymouse=sgr        " a more modern VTE mouse protocol than xterm2 to have mouse work everywhere
 let s:is_windows = has("win16") || has("win32") || has("win64")
 " TODO: fix this at some point; too much bother right now.
 "if s:is_windows
