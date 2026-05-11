@@ -14,6 +14,8 @@ git config --global alias.c 'commit -m'
 git config --global alias.amend 'commit --amend'
 # Short status overview.
 git config --global alias.s 'status --short --branch'
+# Very short status overview.
+git config --global alias.ss '!git s | grep -v "^?? .."'
 # Unstage files already staged.
 git config --global alias.unstage 'reset -q HEAD --'
 # Get rid of any changes you made.
