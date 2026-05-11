@@ -58,6 +58,10 @@ setxkbmap -layout us
 if [ -d $HOME/bin ]; then
   export PATH=$HOME/bin:$PATH
 fi
+export PATH=$HOME/.local/bin:$PATH
+
+# Flatpak support.
+[[ -d "/var/lib/flatpak/exports/share" ]] && export PATH=/var/lib/flatpak/exports/share:$PATH
 
 if [ -d $HOME/.rvm ]; then
   # Load RVM (Ruby Version Manager)
